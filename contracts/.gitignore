@@ -1,12 +1,4 @@
-# Foundry
-out/
 cache/
-
-# Environment
+out/
+broadcast/
 .env
-
-# Dependencies
-node_modules/
-
-# Misc
-.DS_Store
