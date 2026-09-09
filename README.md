@@ -54,7 +54,7 @@ cd crazy-sexy-cool
 cd contracts
 cp .env.example .env
 # .env values:
-# PRIVATE_KEY=0x_your_wallet_private_key
+# PRIVATE_KEY=0x_your_wallet_private_key_here
 # BASESCAN_API_KEY=your_basescan_api_key
 # BASE_SEPOLIA_RPC=https://sepolia.base.org
 # BASE_MAINNET_RPC=https://mainnet.base.org
@@ -97,3 +97,49 @@ npm run build
 npm start          # Production
 npm run dev        # Development (ts-node)
 ```
+
+---
+
+## Contracts
+
+**`contracts/.gitignore`**
+```gitignore
+cache/
+out/
+broadcast/
+.env
+```
+
+---
+
+## 🤝 Contributing
+
+This is a sovereign metaverse. Contributions are soulbound.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/god-skill`)
+3. Commit your changes (`git commit -m 'feat: add weather changer vfx'`)
+4. Push to the branch (`git push origin feature/god-skill`)
+5. Open a Pull Request
+
+All contributions are reviewed through the lens of karmic intention.
+
+---
+
+## 📄 License
+
+MIT License — but remember: karma is soulbound.
+
+---
+
+## 🔗 Links
+
+- Website: crazysexycool.meta
+- Twitter/X: @crazysexycool
+- Discord: discord.gg/crazysexycool
+- Docs: docs.crazysexycool.meta
+
+---
+
+"Wallet in. Identity on. Limits off."
+Forge your soul.
