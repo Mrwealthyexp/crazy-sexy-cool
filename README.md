@@ -53,7 +53,11 @@ cd crazy-sexy-cool
 ```bash
 cd contracts
 cp .env.example .env
-# Edit .env with your PRIVATE_KEY and BASESCAN_API_KEY
+# .env values:
+# PRIVATE_KEY=0x_your_wallet_private_key
+# BASESCAN_API_KEY=your_basescan_api_key
+# BASE_SEPOLIA_RPC=https://sepolia.base.org
+# BASE_MAINNET_RPC=https://mainnet.base.org
 
 # Install dependencies
 forge install OpenZeppelin/openzeppelin-contracts --no-commit
