@@ -22,6 +22,7 @@ This is not a game. It is a **mirror for the soul**.
 | **Soul Forge** | Mint an ERC-6551 soul bound to your wallet. Your birth month, planetary alignment, moon phase, and temperament determine your destiny. |
 | **Three Worldly States** | **Crazy** (fire/chaos), **Sexy** (water/desire), **Cool** (air/detachment). Master all three to transcend. |
 | **Karmic Economy** | Every action is recorded as soulbound karma. White (given), Black (taken), Gray (self-serving). Your ledger determines if you can ascend. |
+| **Creator Economy** | Content drops use a creator-first 90/10 split, on-chain secondary royalties, and $COOL staking for discovery visibility. |
 | **God Skills** | Great Teachers alter weather, deny death, and cause **Fair Emotions** — making enemies see each other's truth. |
 | **World Question** | Enlightened players ask the server a question. The collective answer alters reality for 24 hours. |
 | **Anonymous Intervention** | Divine acts use zk-proofs. The saved never know who saved them. The mystery IS the teaching. |
@@ -29,4 +30,3 @@ This is not a game. It is a **mirror for the soul**.
 ---
 
 ## 🏗️ Architecture
-

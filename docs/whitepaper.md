@@ -30,6 +30,11 @@ Crazy Sexy Cool is an innovative blockchain-based game that combines gaming mech
 - Used for transactions and rewards
 - Governance capabilities
 
+### Creator Economy
+- Primary sales default to a creator-first 90/10 split, with 90% routed to the creator and 10% to the platform.
+- Secondary sales enforce creator royalties through smart contract settlement instead of optional marketplace settings.
+- Creators can stake $COOL to increase visibility in the discovery feed while keeping placement rules transparent on-chain.
+
 ## Roadmap
 
 ### Phase 1: MVP
