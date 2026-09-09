@@ -80,3 +80,16 @@ npm install
 npm run dev        # Development
 npm run build      # Production build
 ```
+
+### 4. Backend: Configure, Build, Run
+
+```bash
+cd backend
+cp .env.example .env
+# Edit .env: OPENAI_API_KEY=sk-...
+
+npm install
+npm run build
+npm start          # Production
+npm run dev        # Development (ts-node)
+```
