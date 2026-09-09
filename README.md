@@ -78,7 +78,7 @@ forge script script/Deploy.s.sol --rpc-url $BASE_SEPOLIA_RPC --broadcast --verif
 ```bash
 cd frontend
 cp .env.example .env
-# Edit .env: VITE_API_URL=https://your-backend-url.com
+# Edit .env: VITE_API_URL=http://localhost:3001   # or your Railway/Render URL
 
 npm install
 npm run dev        # Development
