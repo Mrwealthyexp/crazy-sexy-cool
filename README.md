@@ -68,3 +68,15 @@ forge test
 source .env
 forge script script/Deploy.s.sol --rpc-url $BASE_SEPOLIA_RPC --broadcast --verify
 ```
+
+### 3. Frontend: Configure, Develop, Build
+
+```bash
+cd frontend
+cp .env.example .env
+# Edit .env: VITE_API_URL=https://your-backend-url.com
+
+npm install
+npm run dev        # Development
+npm run build      # Production build
+```
