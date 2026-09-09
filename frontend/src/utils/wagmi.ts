@@ -1,4 +1,3 @@
-import { configureChains, createConfig } from 'wagmi'
-import { publicProvider } from 'wagmi/providers/public'
+export const wagmiConfig = null
 
-// Wagmi configuration here
+export default wagmiConfig
