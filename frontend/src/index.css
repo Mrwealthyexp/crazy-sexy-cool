@@ -3,10 +3,47 @@
 @tailwind utilities;
 
 body {
-  margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica
-    Neue', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  font-family: 'Inter', sans-serif;
+  background: #0a0a0f;
+  color: #ffffff;
+  overflow-x: hidden;
+}
+
+.crazy-gradient {
+  background: linear-gradient(135deg, #FF2D55 0%, #FF6B35 100%);
+}
+
+.sexy-gradient {
+  background: linear-gradient(135deg, #AF52DE 0%, #FF2D55 100%);
+}
+
+.cool-gradient {
+  background: linear-gradient(135deg, #5AC8FA 0%, #AF52DE 100%);
+}
+
+.transcended-glow {
+  box-shadow: 0 0 60px rgba(255, 215, 0, 0.3);
+}
+
+@keyframes pulse-soul {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.soul-pulse {
+  animation: pulse-soul 3s ease-in-out infinite;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0a0f;
+}
+::-webkit-scrollbar-thumb {
+  background: #333;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #555;
 }
