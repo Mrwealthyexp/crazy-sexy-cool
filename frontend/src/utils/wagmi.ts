@@ -1,4 +1,9 @@
-import { configureChains, createConfig } from 'wagmi'
-import { publicProvider } from 'wagmi/providers/public'
+import { createConfig, http } from 'wagmi'
+import { baseSepolia } from 'wagmi/chains'
 
-// Wagmi configuration here
+export const wagmiConfig = createConfig({
+  chains: [baseSepolia],
+  transports: {
+    [baseSepolia.id]: http(),
+  },
+})
