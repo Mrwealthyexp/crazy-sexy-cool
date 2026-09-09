@@ -30,3 +30,41 @@ This is not a game. It is a **mirror for the soul**.
 
 ## 🏗️ Architecture
 
+---
+
+## 🚀 Quick Start
+
+### Prerequisites
+
+- <a href="https://nodejs.org/">Node.js</a> 20+
+- <a href="https://book.getfoundry.sh/getting-started/installation">Foundry</a>
+- <a href="https://git-scm.com/">Git</a>
+- A Web3 wallet (MetaMask, Rainbow, etc.)
+
+### 1. Clone & Install
+
+```bash
+git clone https://github.com/your-org/crazy-sexy-cool.git
+cd crazy-sexy-cool
+```
+
+### 2. Contracts: Configure, Build, Test, Deploy
+
+```bash
+cd contracts
+cp .env.example .env
+# Edit .env with your PRIVATE_KEY and BASESCAN_API_KEY
+
+# Install dependencies
+forge install OpenZeppelin/openzeppelin-contracts --no-commit
+
+# Compile
+forge build
+
+# Test
+forge test
+
+# Deploy to Base Sepolia
+source .env
+forge script script/Deploy.s.sol --rpc-url $BASE_SEPOLIA_RPC --broadcast --verify
+```
