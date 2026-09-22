@@ -1,14 +1,27 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
-import "forge-std/Script.sol";
+import {CoolToken} from '../src/CoolToken.sol';
+import {KarmicLedger} from '../src/KarmicLedger.sol';
+import {SoulForge} from '../src/SoulForge.sol';
+import {TranscendenceEngine} from '../src/TranscendenceEngine.sol';
+import {WeatherOracle} from '../src/WeatherOracle.sol';
 
-contract Deploy is Script {
-    function run() public {
-        vm.startBroadcast();
-        
-        // Deploy contracts here
-        
-        vm.stopBroadcast();
+contract Deploy {
+    function run()
+        external
+        returns (
+            CoolToken coolToken,
+            KarmicLedger karmicLedger,
+            SoulForge soulForge,
+            TranscendenceEngine transcendenceEngine,
+            WeatherOracle weatherOracle
+        )
+    {
+        coolToken = new CoolToken();
+        karmicLedger = new KarmicLedger();
+        soulForge = new SoulForge();
+        transcendenceEngine = new TranscendenceEngine(address(karmicLedger));
+        weatherOracle = new WeatherOracle();
     }
 }
