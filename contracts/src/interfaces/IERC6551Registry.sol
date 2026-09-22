@@ -1,10 +1,20 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.19;
+pragma solidity ^0.8.20;
 
-/**
- * @title IERC6551Registry
- * @dev ERC6551 Registry interface
- */
 interface IERC6551Registry {
-    // Interface methods here
+    function createAccount(
+        address implementation,
+        bytes32 salt,
+        uint256 chainId,
+        address tokenContract,
+        uint256 tokenId
+    ) external returns (address account);
+
+    function account(
+        address implementation,
+        bytes32 salt,
+        uint256 chainId,
+        address tokenContract,
+        uint256 tokenId
+    ) external view returns (address accountAddress);
 }

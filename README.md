@@ -1,32 +1,70 @@
-# 🔥💜💙 CRAZY SEXY COOL
-## A Transcendence Engine Metaverse
+# Crazy Sexy Cool
 
-> *"Your birth determines your destiny. Your karma determines your power. Your enlightenment changes the world."*
+Crazy Sexy Cool (CSC) is a wallet-native metaverse community where identity, assets, social status, and progression are designed to live on-chain.
 
-**Crazy Sexy Cool (CSC)** is a wallet-native, spiritually-mechanical metaverse where players forge souls from cosmic data, evolve through worldly attachments, and achieve **Great Teacher** status with godlike powers. Built on **Base L2**, powered by **ERC-6551 Token-Bound Accounts**, and governed by on-chain karma.
+## Product direction
 
----
+CSC combines:
+- **wallet-first onboarding** with no email or password
+- **ERC-6551 token-bound avatars** so the avatar can act as the player wallet
+- **soulbound reputation and combat licensing** for regulated PvP access
+- **dual-token commerce** with `$COOL` for utility and governance plus stable credits for day-to-day trade
+- **creator-owned assets** across avatars, wearables, land, vehicles, music, and apps
 
-## 🌌 The World
+## Repository ownership map
 
-The year is **2075**. The climate has collapsed and reversed. **California** has been swallowed by the Pacific. **Florida** is a drowned graveyard of coral cathedrals. **Antarctica** has thawed to reveal **Aeterna** — a crystal megacity built by a pre-human civilization, ringed by a 500-meter wall and 2-kilometer god-statues.
+### Product and architecture
+- `/docs/whitepaper.md` — full product, token, governance, and protocol specification
+- `/docs/gdd.md` — player-facing systems, progression, combat loops, and world rules
+- `/docs/lore-bible.md` — setting, factions, and world fiction
 
-This is not a game. It is a **mirror for the soul**.
+### Frontend
+- `/frontend/src/App.tsx` — top-level application shell for onboarding, dashboard, world, marketplace, combat, and governance
+- `/frontend/src/components/SoulForge.tsx` — avatar minting and identity onboarding
+- `/frontend/src/components/SoulDashboard.tsx` — balances, reputation, licenses, assets, and profile state
+- `/frontend/src/components/WorldMap.tsx` — zone discovery, land overview, safe zones, and war zones
+- `/frontend/src/utils/wagmi.ts` — wallet and chain configuration entry point
+- `/frontend/src/stores/gameStore.ts` — client-side derived session state
+- `/frontend/src/data/zones.ts` — static zone metadata used by the UI
+- `/frontend/src/utils/api.ts` — typed frontend API client for platform, world, and combat endpoints
 
----
+### Backend
+- `/backend/src/index.ts` — API gateway for platform overview, world reads, relays, and combat services
+- `/backend/src/services/ShadowArena.ts` — combat orchestration and queue state
+- `/backend/src/services/EmotionOracle.ts` — optional narrative or experimental systems
 
-## ⚡ Core Mechanics
+### Smart contracts
+- `/contracts/src/SoulForge.sol` — avatar identity bootstrapping and minting
+- `/contracts/src/interfaces/IERC6551Registry.sol` — ERC-6551 registry integration boundary
+- `/contracts/src/KarmicLedger.sol` — reputation, misconduct, and combat-license eligibility
+- `/contracts/src/CoolToken.sol` — `$COOL` utility token scaffold
+- `/contracts/src/TranscendenceEngine.sol` — progression and unlock evaluation
+- `/contracts/src/WeatherOracle.sol` — world-state experiment hook
+- `/contracts/script/Deploy.s.sol` — Foundry deployment orchestration
+- `/contracts/test/SoulForge.t.sol` — protocol test coverage starting point
 
-| Feature | Description |
-|---------|-------------|
-| **Soul Forge** | Mint an ERC-6551 soul bound to your wallet. Your birth month, planetary alignment, moon phase, and temperament determine your destiny. |
-| **Three Worldly States** | **Crazy** (fire/chaos), **Sexy** (water/desire), **Cool** (air/detachment). Master all three to transcend. |
-| **Karmic Economy** | Every action is recorded as soulbound karma. White (given), Black (taken), Gray (self-serving). Your ledger determines if you can ascend. |
-| **God Skills** | Great Teachers alter weather, deny death, and cause **Fair Emotions** — making enemies see each other's truth. |
-| **World Question** | Enlightened players ask the server a question. The collective answer alters reality for 24 hours. |
-| **Anonymous Intervention** | Divine acts use zk-proofs. The saved never know who saved them. The mystery IS the teaching. |
+## Current implementation status
 
----
+This repository now provides aligned scaffolding for the target product direction, but it is still an early-stage build. The codebase is organized so that wallet onboarding, protocol primitives, combat services, and product docs can evolve independently without losing architectural clarity.
 
-## 🏗️ Architecture
+## Tooling
 
+### Frontend
+```bash
+cd frontend
+npm install
+npm run build
+```
+
+### Backend
+```bash
+cd backend
+npm install
+npm run build
+```
+
+### Contracts
+```bash
+cd contracts
+forge test
+```
