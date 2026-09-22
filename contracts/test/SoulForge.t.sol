@@ -1,11 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
-import 'forge-std/Test.sol';
 import {KarmicLedger} from '../src/KarmicLedger.sol';
 import {SoulForge} from '../src/SoulForge.sol';
 
-contract SoulForgeTest is Test {
+contract SoulForgeTest {
     SoulForge internal soulForge;
     KarmicLedger internal karmicLedger;
 
@@ -18,9 +17,9 @@ contract SoulForgeTest is Test {
         uint256 avatarId = soulForge.mintAvatar('cool', 'architect');
         SoulForge.AvatarProfile memory avatar = soulForge.getAvatar(avatarId);
 
-        assertEq(avatar.owner, address(this));
-        assertEq(avatar.temperament, 'cool');
-        assertEq(avatar.archetype, 'architect');
+        require(avatar.owner == address(this), 'owner mismatch');
+        require(keccak256(bytes(avatar.temperament)) == keccak256(bytes('cool')), 'temperament mismatch');
+        require(keccak256(bytes(avatar.archetype)) == keccak256(bytes('architect')), 'archetype mismatch');
     }
 
     function test_combatEligibilityRequiresTierAndClearReputation() public {
@@ -30,6 +29,6 @@ contract SoulForgeTest is Test {
         karmicLedger.setLicenseTier(player, 2);
 
         bool eligible = karmicLedger.isEligibleForCombatTier(player, 2);
-        assertTrue(eligible);
+        require(eligible, 'expected eligible');
     }
 }
