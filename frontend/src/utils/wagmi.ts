@@ -3,12 +3,13 @@ import { base, baseSepolia } from 'wagmi/chains'
 
 const supportedChains = [base, baseSepolia] as const
 const configuredChainId = Number(import.meta.env.VITE_CHAIN_ID ?? baseSepolia.id)
-const activeChain = supportedChains.find((chain) => chain.id === configuredChainId) ?? baseSepolia
 const rpcUrl = import.meta.env.VITE_RPC_URL?.trim()
+export const defaultChainId = supportedChains.find((chain) => chain.id === configuredChainId)?.id ?? baseSepolia.id
 
 export const wagmiConfig = createConfig({
-  chains: [activeChain],
+  chains: supportedChains,
   transports: {
-    [activeChain.id]: http(rpcUrl || undefined),
+    [base.id]: http(rpcUrl || undefined),
+    [baseSepolia.id]: http(rpcUrl || undefined),
   },
 })
