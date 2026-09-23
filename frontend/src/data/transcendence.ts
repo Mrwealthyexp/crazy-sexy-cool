@@ -497,6 +497,8 @@ export function canAdvance(profile: SoulProfile) {
     return { allowed: false, reason: 'This soul has already reached the final steward state.' }
   }
 
+  const currentIndex = stageOrder.indexOf(profile.currentStage)
+  const nextStage = stageOrder[currentIndex + 1]
   const required = stageRequirements[profile.currentStage]
   const missing = required.filter((milestone) => !hasMilestone(profile, milestone))
   if (missing.length > 0) {
@@ -508,7 +510,7 @@ export function canAdvance(profile: SoulProfile) {
     }
   }
 
-  if ((profile.currentStage === 'mysterious' || profile.currentStage === 'great-teacher') && !passesKarmicAudit(profile)) {
+  if ((nextStage === 'great-teacher' || nextStage === 'enlightened') && !passesKarmicAudit(profile)) {
     return {
       allowed: false,
       reason: 'The karmic audit failed. White karma must dominate gray and black karma.',

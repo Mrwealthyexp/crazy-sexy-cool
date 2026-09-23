@@ -101,7 +101,7 @@ contract SoulForgeTest is Test {
 
     function test_weatherShiftBurnsCoolAndUpdatesZone() public {
         uint256 soulId = _forgeSoul(player);
-        _ascendToGreatTeacher(soulId, player);
+        _ascendToStage(soulId, player, TranscendenceEngine.Stage.GreatTeacher);
 
         uint256 startingBalance = coolToken.balanceOf(player);
 
@@ -124,7 +124,7 @@ contract SoulForgeTest is Test {
 
     function test_egoicWeatherCreatesGrayKarmaAndSuspension() public {
         uint256 soulId = _forgeSoul(player);
-        _ascendToGreatTeacher(soulId, player);
+        _ascendToStage(soulId, player, TranscendenceEngine.Stage.GreatTeacher);
 
         vm.prank(player);
         engine.invokeWeatherShift(
@@ -164,7 +164,7 @@ contract SoulForgeTest is Test {
 
     function test_grayKarmaBlocksGreatTeacherAscension() public {
         uint256 soulId = _forgeSoul(player);
-        _ascendToServant(soulId, player);
+        _ascendToStage(soulId, player, TranscendenceEngine.Stage.Servant);
 
         vm.startPrank(player);
         engine.recordKarmicDebt(soulId, false, 2_000, 100, "Ego poisoned the rescue.");
@@ -186,7 +186,7 @@ contract SoulForgeTest is Test {
 
     function test_worldQuestionRequiresEnlightenmentAndRespectsCooldown() public {
         uint256 soulId = _forgeSoul(player);
-        _ascendToGreatTeacher(soulId, player);
+        _ascendToStage(soulId, player, TranscendenceEngine.Stage.GreatTeacher);
 
         vm.startPrank(player);
         vm.expectRevert(abi.encodeWithSelector(TranscendenceEngine.OnlyEnlightened.selector, soulId));
@@ -205,7 +205,7 @@ contract SoulForgeTest is Test {
 
     function test_canAdvanceToMysteriousStage() public {
         uint256 soulId = _forgeSoul(player);
-        _ascendToServant(soulId, player);
+        _ascendToStage(soulId, player, TranscendenceEngine.Stage.Servant);
 
         vm.startPrank(player);
         engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.EnemyReconciliation, "reconcile");
@@ -217,55 +217,45 @@ contract SoulForgeTest is Test {
         assertTrue(!soul.isGreatTeacher);
     }
 
-    function _ascendToGreatTeacher(uint256 soulId, address soulOwner) internal {
+    function _ascendToStage(uint256 soulId, address soulOwner, TranscendenceEngine.Stage targetStage) internal {
         vm.startPrank(soulOwner);
         engine.initializeSoul(soulId);
         engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.HumblingDefeat, "humbling defeat");
         engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.SelflessAct, "selfless act");
+        if (targetStage == TranscendenceEngine.Stage.Unknowing) {
+            vm.stopPrank();
+            return;
+        }
         engine.advanceStage(soulId);
         engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.GiftMostValuableAsset, "gift");
+        if (targetStage == TranscendenceEngine.Stage.Wanting) {
+            vm.stopPrank();
+            return;
+        }
         engine.advanceStage(soulId);
         engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.CompassionateGrief, "grief");
+        if (targetStage == TranscendenceEngine.Stage.Detached) {
+            vm.stopPrank();
+            return;
+        }
         engine.advanceStage(soulId);
         engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.Mentorship, "mentor");
+        if (targetStage == TranscendenceEngine.Stage.Integrated) {
+            vm.stopPrank();
+            return;
+        }
         engine.advanceStage(soulId);
         engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.AnonymousRescue, "rescue");
+        if (targetStage == TranscendenceEngine.Stage.Servant) {
+            vm.stopPrank();
+            return;
+        }
         engine.advanceStage(soulId);
+        if (targetStage == TranscendenceEngine.Stage.Mysterious) {
+            vm.stopPrank();
+            return;
+        }
         engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.EnemyReconciliation, "reconcile");
-        engine.advanceStage(soulId);
-        vm.stopPrank();
-    }
-
-    function _ascendToMysterious(uint256 soulId, address soulOwner) internal {
-        vm.startPrank(soulOwner);
-        engine.initializeSoul(soulId);
-        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.HumblingDefeat, "humbling defeat");
-        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.SelflessAct, "selfless act");
-        engine.advanceStage(soulId);
-        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.GiftMostValuableAsset, "gift");
-        engine.advanceStage(soulId);
-        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.CompassionateGrief, "grief");
-        engine.advanceStage(soulId);
-        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.Mentorship, "mentor");
-        engine.advanceStage(soulId);
-        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.AnonymousRescue, "rescue");
-        engine.advanceStage(soulId);
-        vm.stopPrank();
-    }
-
-    function _ascendToServant(uint256 soulId, address soulOwner) internal {
-        vm.startPrank(soulOwner);
-        engine.initializeSoul(soulId);
-        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.HumblingDefeat, "humbling defeat");
-        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.SelflessAct, "selfless act");
-        engine.advanceStage(soulId);
-        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.GiftMostValuableAsset, "gift");
-        engine.advanceStage(soulId);
-        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.CompassionateGrief, "grief");
-        engine.advanceStage(soulId);
-        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.Mentorship, "mentor");
-        engine.advanceStage(soulId);
-        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.AnonymousRescue, "rescue");
         engine.advanceStage(soulId);
         vm.stopPrank();
     }

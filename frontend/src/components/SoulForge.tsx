@@ -120,15 +120,17 @@ export default function SoulForge() {
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <button
           className="rounded-full bg-fuchsia-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-fuchsia-400"
-          onClick={() =>
-            createSoul({
-              ...form,
-              signatureTimestamp: new Date().toISOString(),
-            })
-          }
+          onClick={() => createSoul(form)}
           type="button"
         >
           Mint local soul preview
+        </button>
+        <button
+          className="rounded-full border border-slate-600 px-5 py-3 text-sm font-semibold text-slate-200 transition hover:bg-slate-800"
+          onClick={() => updateField('signatureTimestamp', new Date().toISOString())}
+          type="button"
+        >
+          Use current signature time
         </button>
         <span className="text-sm text-slate-400">Prototype flow: deterministic preview before on-chain minting.</span>
       </div>

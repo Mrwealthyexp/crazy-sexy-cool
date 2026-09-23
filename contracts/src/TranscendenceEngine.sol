@@ -123,10 +123,10 @@ contract TranscendenceEngine is OwnableLite {
             revert SoulAlreadyInitialized(soulId);
         }
 
-        initialized[soulId] = true;
-        _souls[soulId].stage = uint8(Stage.Unknowing);
         karmicLedger.registerSoul(soulId);
         coolToken.mint(soulForge.ownerOf(soulId), 1_000 ether);
+        initialized[soulId] = true;
+        _souls[soulId].stage = uint8(Stage.Unknowing);
 
         emit SoulInitialized(soulId, soulForge.ownerOf(soulId));
     }
