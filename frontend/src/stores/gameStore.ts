@@ -47,6 +47,8 @@ export interface GameStore extends GameState {
   licenseTiers: LicenseTier[]
   consequenceRules: ConsequenceRule[]
   zones: Zone[]
+  licensed: boolean
+  combatReady: boolean
   statusLabel: string
   statusDescription: string
   isLoading: boolean
@@ -110,6 +112,8 @@ function applyOverview(
   | 'licenseTiers'
   | 'consequenceRules'
   | 'zones'
+  | 'licensed'
+  | 'combatReady'
   | 'statusLabel'
   | 'statusDescription'
   | 'isLoading'
@@ -120,6 +124,8 @@ function applyOverview(
     licenseTiers: overview.licenseTiers,
     consequenceRules: overview.consequenceRules,
     zones: getSafeZones(overview.zones),
+    licensed: overview.readiness.licensed,
+    combatReady: overview.readiness.combatReady,
     statusLabel: overview.readiness.statusLabel,
     statusDescription: overview.readiness.statusDescription,
     isLoading: false,
@@ -132,6 +138,8 @@ export const useGameStore = create<GameStore>((set) => ({
   licenseTiers,
   consequenceRules,
   zones: fallbackZones,
+  licensed: initialReadiness.licensed,
+  combatReady: initialReadiness.combatReady,
   statusLabel: initialReadiness.statusLabel,
   statusDescription: initialReadiness.statusDescription,
   isLoading: false,

@@ -10,10 +10,17 @@ export const walletEnvironment = import.meta.env.PROD ? 'mainnet' : 'testnet'
 export const isWalletConfigured = Boolean(walletConnectProjectId)
 export const walletChain = walletEnvironment === 'mainnet' ? base : baseSepolia
 
-export const wagmiConfig = createConfig({
-  chains: [base, baseSepolia],
-  transports: {
-    [base.id]: http(mainnetRpcUrl || undefined),
-    [baseSepolia.id]: http(testnetRpcUrl || undefined),
-  },
-})
+export const wagmiConfig =
+  walletEnvironment === 'mainnet'
+    ? createConfig({
+        chains: [base],
+        transports: {
+          [base.id]: http(mainnetRpcUrl || undefined),
+        },
+      })
+    : createConfig({
+        chains: [baseSepolia],
+        transports: {
+          [baseSepolia.id]: http(testnetRpcUrl || undefined),
+        },
+      })

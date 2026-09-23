@@ -7,10 +7,12 @@ export default function SoulDashboard() {
   const combatProfile = useGameStore((state) => state.combatProfile)
   const consequenceRules = useGameStore((state) => state.consequenceRules)
   const toggleCombatMode = useGameStore((state) => state.toggleCombatMode)
+  const licensed = useGameStore((state) => state.licensed)
   const statusLabel = useGameStore((state) => state.statusLabel)
   const statusDescription = useGameStore((state) => state.statusDescription)
   const isLoading = useGameStore((state) => state.isLoading)
   const error = useGameStore((state) => state.error)
+  const combatToggleHintId = 'combat-toggle-hint'
 
   return (
     <section className="rounded-lg bg-gray-800 p-4 shadow-lg">
@@ -34,8 +36,9 @@ export default function SoulDashboard() {
               : 'bg-cyan-400 text-gray-950'
           } ${isLoading ? 'cursor-not-allowed opacity-70' : combatProfile.combatModeEquipped ? 'hover:bg-rose-400' : 'hover:bg-cyan-300'}`}
           aria-busy={isLoading}
+          aria-describedby={combatToggleHintId}
           aria-pressed={combatProfile.combatModeEquipped}
-          disabled={isLoading}
+          disabled={isLoading || !licensed}
           onClick={() => void toggleCombatMode()}
           type="button"
         >
@@ -46,6 +49,12 @@ export default function SoulDashboard() {
             : 'Equip combat badge'}
         </button>
       </div>
+
+      <p className="mb-6 text-sm text-gray-400" id={combatToggleHintId}>
+        {licensed
+          ? 'Equip your badge to enter war zones and bounty hunts.'
+          : 'Combat mode stays disabled until your license and reputation requirements are cleared.'}
+      </p>
 
       {error ? (
         <div className="mb-6 rounded-lg border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
