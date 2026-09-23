@@ -6,6 +6,7 @@ import {
   defaultZones,
   type GameAction,
   type GameActionResult,
+  type PlayerState,
   type GameState,
   type Zone,
 } from '../../shared/game'
@@ -61,7 +62,7 @@ app.post('/game/action', (req, res) => {
   }
 
   if (action.type === 'TOGGLE_COMBAT_LICENSE') {
-    const player = {
+    const player: PlayerState = {
       ...gameState.player,
       hasCombatLicense: !gameState.player.hasCombatLicense,
     }
@@ -84,7 +85,7 @@ app.post('/game/action', (req, res) => {
   }
 
   if (action.type === 'ENTER_ZONE') {
-    const player = {
+    const player: PlayerState = {
       ...gameState.player,
       currentZoneId: zone.id,
     }
@@ -102,7 +103,7 @@ app.post('/game/action', (req, res) => {
       return
     }
 
-    const player = {
+    const player: PlayerState = {
       ...gameState.player,
       karma: gameState.player.karma + 5,
       souls: gameState.player.souls + 1,
