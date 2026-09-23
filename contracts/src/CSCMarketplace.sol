@@ -3,10 +3,11 @@ pragma solidity ^0.8.20;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
+import '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
 import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
 import './CoolToken.sol';
 
-contract CSCMarketplace is Ownable, ReentrancyGuard {
+contract CSCMarketplace is Ownable, IERC721Receiver, ReentrancyGuard {
     struct Listing {
         address seller;
         address tokenContract;
@@ -70,10 +71,11 @@ contract CSCMarketplace is Ownable, ReentrancyGuard {
 
         listing.active = false;
 
-        require(coolToken.transferFrom(msg.sender, listing.seller, sellerAmount), 'Seller transfer failed');
-        require(coolToken.transferFrom(msg.sender, treasury, platformFeeAmount), 'Treasury transfer failed');
-        require(coolToken.transferFrom(msg.sender, charityPool, charityAmount), 'Charity transfer failed');
-        require(coolToken.transferFrom(msg.sender, address(0x000000000000000000000000000000000000dEaD), burnAmount), 'Burn transfer failed');
+        require(coolToken.transferFrom(msg.sender, address(this), price), 'Payment transfer failed');
+        require(coolToken.transfer(listing.seller, sellerAmount), 'Seller transfer failed');
+        require(coolToken.transfer(treasury, platformFeeAmount), 'Treasury transfer failed');
+        require(coolToken.transfer(charityPool, charityAmount), 'Charity transfer failed');
+        require(coolToken.burn(burnAmount), 'Burn failed');
 
         IERC721(listing.tokenContract).transferFrom(address(this), msg.sender, listing.tokenId);
 
@@ -103,5 +105,9 @@ contract CSCMarketplace is Ownable, ReentrancyGuard {
 
     function totalListings() external view returns (uint256) {
         return _listingIdCounter;
+    }
+
+    function onERC721Received(address, address, uint256, bytes calldata) external pure returns (bytes4) {
+        return IERC721Receiver.onERC721Received.selector;
     }
 }

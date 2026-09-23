@@ -12,12 +12,14 @@ contract KarmicLedger {
     }
 
     address public immutable admin;
+    address public karmaRecorder;
 
     mapping(address => ReputationProfile) private profiles;
 
     event ReputationUpdated(address indexed player, uint64 whiteKarma, uint64 grayKarma, uint64 blackKarma);
     event LicenseTierSet(address indexed player, uint8 tier);
     event KarmaRecorded(uint256 indexed soulId, uint8 indexed karmaType, uint256 amount, string reason);
+    event KarmaRecorderSet(address indexed recorder);
 
     modifier onlyAdmin() {
         require(msg.sender == admin, 'Only admin');
@@ -51,7 +53,13 @@ contract KarmicLedger {
         emit LicenseTierSet(player, tier);
     }
 
+    function setKarmaRecorder(address recorder) external onlyAdmin {
+        karmaRecorder = recorder;
+        emit KarmaRecorderSet(recorder);
+    }
+
     function recordKarma(uint256 soulId, uint8 karmaType, uint256 amount, string calldata reason) external {
+        require(msg.sender == admin || msg.sender == karmaRecorder, 'Unauthorized recorder');
         emit KarmaRecorded(soulId, karmaType, amount, reason);
     }
 

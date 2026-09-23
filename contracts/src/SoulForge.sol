@@ -75,7 +75,6 @@ contract SoulForge is ERC721, ERC721Enumerable, Ownable, ReentrancyGuard {
         });
 
         _safeMint(msg.sender, soulId);
-        walletToSoul[msg.sender] = soulId;
 
         if (address(registry) != address(0) && accountImplementation != address(0)) {
             createTokenBoundAccount(soulId);
@@ -88,10 +87,10 @@ contract SoulForge is ERC721, ERC721Enumerable, Ownable, ReentrancyGuard {
         bytes32 salt = keccak256(abi.encodePacked(soulId));
         address tba = registry.createAccount(
             accountImplementation,
+            salt,
             block.chainid,
             address(this),
             soulId,
-            uint256(salt),
             ''
         );
 
@@ -130,7 +129,18 @@ contract SoulForge is ERC721, ERC721Enumerable, Ownable, ReentrancyGuard {
         override(ERC721, ERC721Enumerable)
         returns (address)
     {
-        return super._update(to, tokenId, auth);
+        address previousOwner = super._update(to, tokenId, auth);
+
+        if (previousOwner != address(0) && walletToSoul[previousOwner] == tokenId) {
+            walletToSoul[previousOwner] = 0;
+        }
+
+        if (to != address(0)) {
+            require(walletToSoul[to] == 0 || walletToSoul[to] == tokenId, 'Wallet already has soul');
+            walletToSoul[to] = tokenId;
+        }
+
+        return previousOwner;
     }
 
     function _increaseBalance(address account, uint128 value)

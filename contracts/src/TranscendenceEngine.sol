@@ -64,6 +64,7 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
     uint256 public currentWorldQuestionBlock;
     string public currentWorldQuestion;
     mapping(address => string) public worldAnswers;
+    mapping(address => uint256) public lastAnsweredQuestionBlock;
     address[] public worldAnswerers;
 
     event StageAdvanced(uint256 indexed soulId, WorldlyState newStage);
@@ -86,8 +87,7 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
         coolToken = CoolToken(_coolToken);
     }
 
-    function initializeSoulState(uint256 soulId) external {
-        require(soulForge.ownerOf(soulId) != address(0), 'Soul does not exist');
+    function initializeSoulState(uint256 soulId) external onlySoulOwner(soulId) {
         require(!soulStates[soulId].initialized, 'Already initialized');
 
         SoulForge.SoulBlueprint memory blueprint = soulForge.getSoulBlueprint(soulId);
@@ -251,8 +251,13 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
         uint256 soulId = soulForge.getSoulByWallet(msg.sender);
         require(soulId != 0, 'No soul');
         require(bytes(answer).length > 0, 'Empty answer');
+
+        if (lastAnsweredQuestionBlock[msg.sender] != currentWorldQuestionBlock) {
+            worldAnswerers.push(msg.sender);
+            lastAnsweredQuestionBlock[msg.sender] = currentWorldQuestionBlock;
+        }
+
         worldAnswers[msg.sender] = answer;
-        worldAnswerers.push(msg.sender);
     }
 
     function levelUpJob(uint256 soulId, uint256 jobId) external onlySoulOwner(soulId) {

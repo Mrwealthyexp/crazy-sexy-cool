@@ -24,6 +24,7 @@ contract Deploy {
         karmicLedger = new KarmicLedger();
         soulForge = new SoulForge(address(0), address(0));
         transcendenceEngine = new TranscendenceEngine(address(soulForge), address(karmicLedger), address(coolToken));
+        karmicLedger.setKarmaRecorder(address(transcendenceEngine));
         weatherOracle = new WeatherOracle();
         marketplace = new CSCMarketplace(address(coolToken), msg.sender, msg.sender);
     }

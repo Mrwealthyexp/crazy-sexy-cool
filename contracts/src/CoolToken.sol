@@ -49,6 +49,14 @@ contract CoolToken {
         return true;
     }
 
+    function burn(uint256 amount) external returns (bool) {
+        require(balanceOf[msg.sender] >= amount, 'Balance too low');
+        balanceOf[msg.sender] -= amount;
+        totalSupply -= amount;
+        emit Transfer(msg.sender, address(0), amount);
+        return true;
+    }
+
     function _transfer(address from, address to, uint256 amount) internal {
         require(to != address(0), 'Invalid recipient');
         require(balanceOf[from] >= amount, 'Balance too low');
