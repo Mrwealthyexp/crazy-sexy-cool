@@ -57,7 +57,10 @@ app.post('/game/action', async (req, res) => {
 
   if (action.type === 'challenge') {
     const result = await shadowArena.processBattleAction(action)
-    res.json(result)
+    res.json({
+      action: 'challenge',
+      ...result,
+    })
     return
   }
 

@@ -34,6 +34,31 @@ export interface GameActionInput {
   combatLicense?: 'none' | 'initiate' | 'teacher'
 }
 
+export interface ChallengeActionResponse {
+  action: 'challenge'
+  actorId: string
+  targetId?: string
+  allowed: boolean
+  resolution: string
+}
+
+export interface InvokeActionResponse {
+  action: 'invoke'
+  reading: EmotionalReading
+  karmicCost: string
+}
+
+export interface MeditateActionResponse {
+  action: 'meditate'
+  resolution: {
+    winningPhase: 'Crazy' | 'Sexy' | 'Cool' | 'Balanced'
+    karmicImpact: string
+  }
+  karmaShift: number
+}
+
+export type GameActionResponse = ChallengeActionResponse | InvokeActionResponse | MeditateActionResponse
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
 
 export async function fetchGameData(): Promise<GameDataResponse> {
@@ -44,7 +69,7 @@ export async function fetchGameData(): Promise<GameDataResponse> {
   return response.json()
 }
 
-export async function submitGameAction(action: GameActionInput) {
+export async function submitGameAction(action: GameActionInput): Promise<GameActionResponse> {
   const response = await fetch(`${API_URL}/game/action`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -55,5 +80,5 @@ export async function submitGameAction(action: GameActionInput) {
     throw new Error('Failed to submit game action.')
   }
 
-  return response.json()
+  return response.json() as Promise<GameActionResponse>
 }
