@@ -72,7 +72,7 @@ contract SoulForgeTest is Test {
         engine.meditate();
         engine.createArtifact("soul-forge");
         engine.createArtifact("aeterna-gate");
-        engine.createArtifact("shadow-arena");
+        engine.createArtifact("aeterna-gate");
         engine.createArtifact("oracle-district");
         engine.completeBounty(90);
         engine.grantCombatLicense();
@@ -111,7 +111,7 @@ contract SoulForgeTest is Test {
         engine.meditate();
         engine.createArtifact("soul-forge");
         engine.createArtifact("aeterna-gate");
-        engine.createArtifact("shadow-arena");
+        engine.createArtifact("aeterna-gate");
         engine.createArtifact("oracle-district");
         engine.completeBounty(90);
         engine.grantCombatLicense();

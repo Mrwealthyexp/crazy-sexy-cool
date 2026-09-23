@@ -65,7 +65,7 @@ contract TranscendenceEngine {
     }
 
     function createArtifact(string calldata zoneId) external onlySoulOwner {
-        _requireSupportedZone(zoneId);
+        _requireCreativeZone(zoneId);
         uint256 soulId = soulForge.soulIdOf(msg.sender);
         soulForge.shiftWorldState(soulId, SoulForge.WorldState.Sexy);
         soulForge.adjustFocus(soulId, 15);
@@ -186,6 +186,13 @@ contract TranscendenceEngine {
         }
     }
 
+    function _requireCreativeZone(string calldata zoneId) internal pure {
+        _requireSupportedZone(zoneId);
+        if (keccak256(bytes(zoneId)) == keccak256(bytes("shadow-arena"))) {
+            revert InvalidCreationZone();
+        }
+    }
+
     error SoulAlreadyInitialized();
     error SoulMissing();
     error InvalidMasteryScore();
@@ -196,5 +203,6 @@ contract TranscendenceEngine {
     error ActiveWorldQuestion();
     error EmptyWorldQuestion();
     error UnsupportedZone();
+    error InvalidCreationZone();
     error NotReadyToTranscend(string reason);
 }

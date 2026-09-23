@@ -1,8 +1,11 @@
 import { useGameStore } from '../stores/gameStore'
+import { mockTokenBoundAccount } from '../utils/wagmi'
 
 export default function WorldMap() {
   const world = useGameStore((state) => state.world)
   const player = useGameStore((state) => state.player)
+  const wallet = useGameStore((state) => state.wallet)
+  const forgeDraft = useGameStore((state) => state.forgeDraft)
   const runAction = useGameStore((state) => state.runAction)
   const loading = useGameStore((state) => state.loading)
 
@@ -43,6 +46,10 @@ export default function WorldMap() {
       <div className="zone-grid">
         {world.zones.map((zone) => {
           const active = player?.activeZoneId === zone.id
+          const actionDisabled =
+            loading ||
+            !player ||
+            (zone.primaryAction === 'forge-soul' ? Boolean(player.soul) : !player.soul)
           return (
             <article key={zone.id} className={`zone-card ${active ? 'zone-card-active' : ''}`}>
               <div className="zone-card-header">
@@ -59,13 +66,18 @@ export default function WorldMap() {
               <div className="zone-actions">
                 <button
                   className="secondary-button"
-                  disabled={loading || !player?.soul || zone.primaryAction === 'forge-soul'}
+                  disabled={actionDisabled}
                   onClick={() =>
                     runAction({
                       type: zone.primaryAction,
                       zoneId: zone.id,
                       payload:
-                        zone.primaryAction === 'engage-combat'
+                        zone.primaryAction === 'forge-soul'
+                          ? {
+                              ...forgeDraft,
+                              tokenBoundAccount: mockTokenBoundAccount(wallet),
+                            }
+                          : zone.primaryAction === 'engage-combat'
                           ? { honorable: true }
                           : undefined,
                     })

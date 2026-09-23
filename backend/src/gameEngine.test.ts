@@ -37,7 +37,7 @@ test('transcendence unlocks authorship and ask-world-question mutates shared wor
   engine.applyAction({ wallet, type: 'meditate' })
   engine.applyAction({ wallet, type: 'create-artifact', zoneId: 'soul-forge' })
   engine.applyAction({ wallet, type: 'create-artifact', zoneId: 'aeterna-gate' })
-  engine.applyAction({ wallet, type: 'create-artifact', zoneId: 'shadow-arena' })
+  engine.applyAction({ wallet, type: 'create-artifact', zoneId: 'aeterna-gate' })
   engine.applyAction({ wallet, type: 'create-artifact', zoneId: 'oracle-district' })
   engine.applyAction({ wallet, type: 'complete-bounty', payload: { masteryScore: 90 } })
   engine.applyAction({ wallet, type: 'license-combat' })
@@ -61,4 +61,17 @@ test('transcendence unlocks authorship and ask-world-question mutates shared wor
   assert.equal(ask.world.currentQuestion, 'What heals the city?')
   assert.equal(ask.world.collectiveAnswer, 'Collective honesty.')
   assert.equal(ask.player.activeZoneId, 'oracle-district')
+
+  const secondQuestion = engine.applyAction({
+    wallet,
+    type: 'ask-world-question',
+    zoneId: 'oracle-district',
+    payload: {
+      question: 'Who leads next?',
+      answer: 'Those who listen.',
+    },
+  })
+
+  assert.equal(secondQuestion.success, false)
+  assert.equal(secondQuestion.message, 'A world question is already active.')
 })

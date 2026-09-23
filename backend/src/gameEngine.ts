@@ -190,6 +190,9 @@ export function createGameEngine(): GameEngine {
           case 'create-artifact': {
             const soul = requireSoul(player)
             const zoneId = action.zoneId ?? 'aeterna-gate'
+            if (getZone(zoneId).primaryAction === 'engage-combat') {
+              throw new Error('Artifacts cannot be created inside combat-only zones.')
+            }
             soul.worldState = 'sexy'
             soul.focus += 15
             player.karma.white += 3
