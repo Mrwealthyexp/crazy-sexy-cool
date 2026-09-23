@@ -6,6 +6,13 @@ import {KarmicLedger} from '../src/KarmicLedger.sol';
 import {SoulForge} from '../src/SoulForge.sol';
 import {TranscendenceEngine} from '../src/TranscendenceEngine.sol';
 
+contract SoulTransferHelper {
+    function forgeAndTransfer(SoulForge soulForge, address recipient) external payable returns (uint256 soulId) {
+        soulId = soulForge.forgeSoul{value: msg.value}(2, 12, 4, 3);
+        soulForge.transferFrom(address(this), recipient, soulId);
+    }
+}
+
 contract SoulForgeTest {
     SoulForge internal soulForge;
     KarmicLedger internal karmicLedger;
@@ -41,6 +48,18 @@ contract SoulForgeTest {
 
         require(soulForge.getSoulByWallet(address(this)) == 0, 'sender mapping not cleared');
         require(soulForge.getSoulByWallet(recipient) == soulId, 'recipient mapping not set');
+    }
+
+    function test_transferToWalletWithExistingSoulReverts() public {
+        uint256 soulId = soulForge.forgeSoul{value: soulForge.MINT_COST()}(1, 5, 1, 2);
+        address recipient = address(0xBEEF);
+        SoulTransferHelper helper = new SoulTransferHelper();
+
+        helper.forgeAndTransfer{value: soulForge.MINT_COST()}(soulForge, recipient);
+
+        (bool success, ) =
+            address(soulForge).call(abi.encodeWithSignature('transferFrom(address,address,uint256)', address(this), recipient, soulId));
+        require(!success, 'expected transfer revert');
     }
 
     function test_transcendenceEngineWiring() public view {

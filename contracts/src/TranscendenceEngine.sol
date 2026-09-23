@@ -113,6 +113,7 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
     }
 
     function recordKarma(uint256 soulId, uint8 karmaType, uint256 amount) external onlyOwner {
+        require(karmaType <= 2, 'Invalid karma type');
         SoulState storage soul = soulStates[soulId];
         if (karmaType == 0) soul.whiteKarma += amount;
         else if (karmaType == 1) soul.blackKarma += amount;
@@ -250,6 +251,7 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
     function answerWorldQuestion(string calldata answer) external {
         uint256 soulId = soulForge.getSoulByWallet(msg.sender);
         require(soulId != 0, 'No soul');
+        require(currentWorldQuestionBlock != 0, 'No active question');
         require(bytes(answer).length > 0, 'Empty answer');
 
         if (lastAnsweredQuestionBlock[msg.sender] != currentWorldQuestionBlock) {
@@ -326,6 +328,8 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
 
     function canAscend(uint256 soulId) external view returns (bool) {
         SoulState storage soul = soulStates[soulId];
+        if (uint256(soul.stage) >= 7) return false;
+        if (block.timestamp < soul.lastAscensionTime + ASCENSION_LOCK) return false;
         bool pureIntention =
             (soul.whiteKarma > soul.grayKarma * 2) && (soul.blackKarma == 0 || soul.whiteKarma > soul.blackKarma * 10);
         return pureIntention && checkStageRequirements(soulId, soul.stage);

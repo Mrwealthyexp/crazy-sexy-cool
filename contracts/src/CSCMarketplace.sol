@@ -64,14 +64,19 @@ contract CSCMarketplace is Ownable, IERC721Receiver, ReentrancyGuard {
         require(listing.seller != msg.sender, 'Cannot buy own item');
 
         uint256 price = listing.price;
+        uint256 sellerBaseAmount = (price * CREATOR_SHARE) / FEE_DENOMINATOR;
         uint256 platformFeeAmount = (price * PLATFORM_FEE) / FEE_DENOMINATOR;
         uint256 burnAmount = (price * BURN_SHARE) / FEE_DENOMINATOR;
         uint256 charityAmount = (price * CHARITY_SHARE) / FEE_DENOMINATOR;
-        uint256 sellerAmount = price - platformFeeAmount - burnAmount - charityAmount;
+        uint256 remainder = price - sellerBaseAmount - platformFeeAmount - burnAmount - charityAmount;
+        uint256 sellerAmount = sellerBaseAmount + remainder;
 
         listing.active = false;
 
+        uint256 balanceBefore = coolToken.balanceOf(address(this));
         require(coolToken.transferFrom(msg.sender, address(this), price), 'Payment transfer failed');
+        uint256 receivedAmount = coolToken.balanceOf(address(this)) - balanceBefore;
+        require(receivedAmount == price, 'Unsupported fee token');
         require(coolToken.transfer(listing.seller, sellerAmount), 'Seller transfer failed');
         require(coolToken.transfer(treasury, platformFeeAmount), 'Treasury transfer failed');
         require(coolToken.transfer(charityPool, charityAmount), 'Charity transfer failed');
