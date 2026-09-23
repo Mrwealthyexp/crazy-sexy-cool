@@ -79,4 +79,23 @@ contract CoolTokenTest is Test {
         vm.prank(alice);
         token.mint(alice, 1 ether);
     }
+
+    function test_burnReducesSupply() public {
+        vm.prank(treasury);
+        token.burn(10 ether);
+        assertEq(token.totalSupply(), INITIAL_SUPPLY - 10 ether);
+        assertEq(token.balanceOf(treasury), INITIAL_SUPPLY - 10 ether);
+    }
+
+    function test_burnFromUsesAllowance() public {
+        vm.prank(treasury);
+        token.approve(alice, 20 ether);
+
+        vm.prank(alice);
+        token.burnFrom(treasury, 12 ether);
+
+        assertEq(token.totalSupply(), INITIAL_SUPPLY - 12 ether);
+        assertEq(token.balanceOf(treasury), INITIAL_SUPPLY - 12 ether);
+        assertEq(token.allowance(treasury, alice), 8 ether);
+    }
 }

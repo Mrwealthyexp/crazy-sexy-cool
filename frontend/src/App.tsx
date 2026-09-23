@@ -51,8 +51,8 @@ function App() {
             <p className="text-sm mt-1">Switch to Base Sepolia to continue.</p>
             <button
               className="mt-3 rounded-md bg-amber-500 px-3 py-2 text-sm font-semibold text-black disabled:opacity-70"
-              disabled={isSwitchPending}
-              onClick={() => switchChain({ chainId: requiredChain.id })}
+              disabled={isSwitchPending || !switchChain}
+              onClick={() => switchChain?.({ chainId: requiredChain.id })}
             >
               {isSwitchPending ? 'Switching...' : 'Switch Network'}
             </button>

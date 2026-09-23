@@ -124,7 +124,7 @@ contract CoolToken {
     }
 
     function _approve(address tokenOwner, address spender, uint256 amount) internal {
-        if (spender == address(0)) revert ZeroAddress();
+        if (tokenOwner == address(0) || spender == address(0)) revert ZeroAddress();
         allowance[tokenOwner][spender] = amount;
         emit Approval(tokenOwner, spender, amount);
     }
