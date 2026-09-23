@@ -67,6 +67,7 @@ export type GameActionType =
   | 'license-combat'
   | 'engage-combat'
   | 'transcend'
+  | 'ask-world-question'
 
 export interface GameActionRequest {
   wallet: string
@@ -79,6 +80,8 @@ export interface GameActionRequest {
     tokenBoundAccount?: string
     masteryScore?: number
     honorable?: boolean
+    question?: string
+    answer?: string
   }
 }
 

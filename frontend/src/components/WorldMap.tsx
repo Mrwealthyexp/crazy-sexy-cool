@@ -59,7 +59,7 @@ export default function WorldMap() {
               <div className="zone-actions">
                 <button
                   className="secondary-button"
-                  disabled={loading || !player?.soul}
+                  disabled={loading || !player?.soul || zone.primaryAction === 'forge-soul'}
                   onClick={() =>
                     runAction({
                       type: zone.primaryAction,
@@ -77,17 +77,30 @@ export default function WorldMap() {
                     : zone.primaryAction === 'meditate'
                       ? 'Meditate here'
                       : zone.primaryAction === 'forge-soul'
-                        ? 'Forge here'
+                        ? 'Soul already forged'
                         : 'Create here'}
                 </button>
                 {zone.id === 'oracle-district' ? (
                   <button
                     className="secondary-button"
                     disabled={loading || !player?.soul}
-                    onClick={() => runAction({ type: 'transcend', zoneId: zone.id })}
+                    onClick={() =>
+                      runAction(
+                        player.soul?.transcended
+                          ? {
+                              type: 'ask-world-question',
+                              zoneId: zone.id,
+                              payload: {
+                                question: 'What heals the city?',
+                                answer: 'Collective honesty.',
+                              },
+                            }
+                          : { type: 'transcend', zoneId: zone.id },
+                      )
+                    }
                     type="button"
                   >
-                    Attempt transcendence
+                    {player.soul?.transcended ? 'Ask world question' : 'Attempt transcendence'}
                   </button>
                 ) : null}
               </div>
