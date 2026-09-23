@@ -11,15 +11,16 @@ import {TranscendenceEngine} from "../src/TranscendenceEngine.sol";
 contract Deploy is Script {
     function run() public {
         uint256 deployerKey = vm.envUint("PRIVATE_KEY");
+        address deployer = vm.addr(deployerKey);
 
         vm.startBroadcast(deployerKey);
 
-        CoolToken coolToken = new CoolToken(msg.sender);
-        SoulForge soulForge = new SoulForge(msg.sender);
-        KarmicLedger karmicLedger = new KarmicLedger(msg.sender);
-        WeatherOracle weatherOracle = new WeatherOracle(msg.sender);
+        CoolToken coolToken = new CoolToken(deployer);
+        SoulForge soulForge = new SoulForge(deployer);
+        KarmicLedger karmicLedger = new KarmicLedger(deployer);
+        WeatherOracle weatherOracle = new WeatherOracle(deployer);
         TranscendenceEngine engine = new TranscendenceEngine(
-            msg.sender,
+            deployer,
             address(soulForge),
             address(karmicLedger),
             address(coolToken),

@@ -132,7 +132,7 @@ export default function SoulDashboard() {
         </div>
       </div>
 
-      {(playerSoul.isGreatTeacher || playerSoul.isEnlightened) && (
+      {playerSoul.isEnlightened && (
         <div className="mt-6 rounded-2xl border border-fuchsia-500/20 bg-fuchsia-950/20 p-4">
           <h3 className="text-xl font-semibold text-white">World Question</h3>
           <p className="mt-2 text-sm text-slate-300">

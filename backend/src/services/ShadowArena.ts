@@ -3,12 +3,12 @@
  * Handles game arena and battle mechanics
  */
 export class ShadowArena {
-  async initializeBattle(players: any[]) {
+  async initializeBattle(_players: unknown[]) {
     // Initialize battle logic
     return {}
   }
 
-  async processBattleAction(action: any) {
+  async processBattleAction(_action: unknown) {
     // Process battle action
     return {}
   }
