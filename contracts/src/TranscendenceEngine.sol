@@ -81,9 +81,9 @@ contract TranscendenceEngine is OwnableLite {
     mapping(uint256 => JourneyFlags) private _journeys;
     mapping(uint256 => bool) public initialized;
     mapping(uint256 => uint256) public divinePowerSuspensionEndsAt;
+    mapping(uint256 => uint256) public lastWorldQuestionAskedAt;
 
     string public worldQuestion;
-    uint256 public lastWorldQuestionAskedAt;
 
     event SoulInitialized(uint256 indexed soulId, address indexed soulOwner);
     event MilestoneRecorded(uint256 indexed soulId, JourneyMilestone indexed milestone, string context);
@@ -303,10 +303,10 @@ contract TranscendenceEngine is OwnableLite {
         if (!_souls[soulId].isEnlightened) {
             revert OnlyEnlightened(soulId);
         }
-        require(block.timestamp > lastWorldQuestionAskedAt + 30 days, "Too soon");
+        require(block.timestamp > lastWorldQuestionAskedAt[soulId] + 30 days, "Too soon");
 
         worldQuestion = question;
-        lastWorldQuestionAskedAt = block.timestamp;
+        lastWorldQuestionAskedAt[soulId] = block.timestamp;
 
         emit WorldQuestionAsked(soulId, question);
     }

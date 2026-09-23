@@ -19,7 +19,6 @@ app.get('/game/data', (_req, res) => {
   res.json({
     world: 'Crazy Sexy Cool',
     moonPhase: 'Full',
-    availableZones: ['red-district', 'velvet-lounge', 'glass-tower', 'nexus', 'shadow-realm', 'throne-room'],
     message: 'Prototype world state for the transcendence engine.',
   })
 })

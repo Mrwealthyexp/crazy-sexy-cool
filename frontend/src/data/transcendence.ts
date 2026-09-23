@@ -362,7 +362,7 @@ const stageRequirements: Record<Exclude<StageId, 'enlightened'>, SoulMilestone[]
   'great-teacher': ['fairEmotions'],
 }
 
-const stageOrder: StageId[] = [
+export const stageOrder: StageId[] = [
   'crazy',
   'sexy',
   'cool',
@@ -475,13 +475,6 @@ export function performAction(profile: SoulProfile, actionId: SoulMilestone): So
 
   if (action.karmaType !== 'none') {
     nextProfile.karma[action.karmaType] += action.karmaDelta
-  }
-
-  if (action.stage === 'integrated') {
-    nextProfile.auraVisible = true
-  }
-  if (action.stage === 'great-teacher') {
-    nextProfile.isGreatTeacher = true
   }
 
   return nextProfile

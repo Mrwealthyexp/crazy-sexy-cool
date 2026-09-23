@@ -1,4 +1,4 @@
-import { getMoonDefinition } from '../data/transcendence'
+import { getMoonDefinition, stageOrder } from '../data/transcendence'
 import { zones } from '../data/zones'
 import { useGameStore } from '../stores/gameStore'
 
@@ -64,7 +64,5 @@ export default function WorldMap() {
 }
 
 function stageRank(stage: string) {
-  return ['crazy', 'sexy', 'cool', 'integrated', 'servant', 'mysterious', 'great-teacher', 'enlightened'].indexOf(
-    stage,
-  )
+  return stageOrder.indexOf(stage as (typeof stageOrder)[number])
 }

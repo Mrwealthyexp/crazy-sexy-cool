@@ -164,7 +164,7 @@ contract SoulForgeTest is Test {
 
     function test_grayKarmaBlocksGreatTeacherAscension() public {
         uint256 soulId = _forgeSoul(player);
-        _ascendToMysterious(soulId, player);
+        _ascendToServant(soulId, player);
 
         vm.startPrank(player);
         engine.recordKarmicDebt(soulId, false, 2_000, 100, "Ego poisoned the rescue.");
@@ -223,6 +223,23 @@ contract SoulForgeTest is Test {
     }
 
     function _ascendToMysterious(uint256 soulId, address soulOwner) internal {
+        vm.startPrank(soulOwner);
+        engine.initializeSoul(soulId);
+        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.HumblingDefeat, "humbling defeat");
+        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.SelflessAct, "selfless act");
+        engine.advanceStage(soulId);
+        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.GiftMostValuableAsset, "gift");
+        engine.advanceStage(soulId);
+        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.CompassionateGrief, "grief");
+        engine.advanceStage(soulId);
+        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.Mentorship, "mentor");
+        engine.advanceStage(soulId);
+        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.AnonymousRescue, "rescue");
+        engine.advanceStage(soulId);
+        vm.stopPrank();
+    }
+
+    function _ascendToServant(uint256 soulId, address soulOwner) internal {
         vm.startPrank(soulOwner);
         engine.initializeSoul(soulId);
         engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.HumblingDefeat, "humbling defeat");
