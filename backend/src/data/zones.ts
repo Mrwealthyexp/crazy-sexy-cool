@@ -1,4 +1,4 @@
-import type { Zone } from '../types/game'
+import type { Zone } from '../types/game.js'
 
 export const zones: Zone[] = [
   {
