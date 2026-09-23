@@ -26,6 +26,10 @@ contract SoulForgeTest {
         transcendenceEngine = new TranscendenceEngine(address(soulForge), address(karmicLedger), address(coolToken));
     }
 
+    function attemptTransferTo(address recipient, uint256 soulId) external {
+        soulForge.transferFrom(address(this), recipient, soulId);
+    }
+
     function test_soulForgeStartsWithZeroSupply() public view {
         require(soulForge.getTotalSouls() == 0, 'expected zero souls');
     }
@@ -57,9 +61,97 @@ contract SoulForgeTest {
 
         helper.forgeAndTransfer{value: soulForge.MINT_COST()}(soulForge, recipient);
 
-        (bool success, ) =
-            address(soulForge).call(abi.encodeWithSignature('transferFrom(address,address,uint256)', address(this), recipient, soulId));
-        require(!success, 'expected transfer revert');
+        try this.attemptTransferTo(recipient, soulId) {
+            revert('expected transfer revert');
+        } catch Error(string memory reason) {
+            require(
+                keccak256(bytes(reason)) == keccak256(bytes('Wallet already has soul')),
+                'unexpected revert reason'
+            );
+        }
+    }
+
+    function test_ownerCanWithdrawMintProceeds() public {
+        soulForge.forgeSoul{value: soulForge.MINT_COST()}(2, 3, 1, 1);
+        uint256 ownerBalanceBeforeWithdraw = address(this).balance;
+        uint256 contractBalanceBeforeWithdraw = address(soulForge).balance;
+
+        soulForge.withdraw();
+
+        require(address(soulForge).balance == 0, 'contract balance not emptied');
+        require(
+            address(this).balance == ownerBalanceBeforeWithdraw + contractBalanceBeforeWithdraw,
+            'owner did not receive full proceeds'
+        );
+    }
+
+    function test_levelUpJobCanTriggerOverEvolved() public {
+        uint256 soulId = soulForge.forgeSoul{value: soulForge.MINT_COST()}(1, 8, 1, 0);
+
+        transcendenceEngine.initializeSoulState(soulId);
+        transcendenceEngine.addMitochondrialPoints(soulId, 10001);
+        transcendenceEngine.levelUpJob(soulId, 0);
+
+        uint256 jobLevel = transcendenceEngine.getJobLevel(soulId, 0);
+        (
+            TranscendenceEngine.WorldlyState stage,
+            uint256 whiteKarma,
+            uint256 blackKarma,
+            uint256 grayKarma,
+            uint256 soulTokens,
+            uint256 mitochondrialPoints,
+            bool overEvolved,
+            uint256 lastAscensionTime,
+            uint256 interventionsPerformed,
+            uint256 interventionsReceived
+        ) = transcendenceEngine.getSoulState(soulId);
+
+        stage;
+        whiteKarma;
+        blackKarma;
+        grayKarma;
+        soulTokens;
+        mitochondrialPoints;
+        lastAscensionTime;
+        interventionsPerformed;
+        interventionsReceived;
+
+        require(jobLevel == 1, 'job level not increased');
+        require(overEvolved, 'expected overEvolved');
+    }
+
+    function test_karmicAndSoulTokenMutatorsUpdateState() public {
+        uint256 soulId = soulForge.forgeSoul{value: soulForge.MINT_COST()}(0, 9, 2, 2);
+        transcendenceEngine.initializeSoulState(soulId);
+
+        transcendenceEngine.recordKarma(soulId, 0, 5);
+        transcendenceEngine.earnSoulTokens(soulId, 50);
+        transcendenceEngine.burnSoulTokens(soulId, 25);
+
+        (
+            TranscendenceEngine.WorldlyState stage,
+            uint256 whiteKarma,
+            uint256 blackKarma,
+            uint256 grayKarma,
+            uint256 soulTokens,
+            uint256 mitochondrialPoints,
+            bool overEvolved,
+            uint256 lastAscensionTime,
+            uint256 interventionsPerformed,
+            uint256 interventionsReceived
+        ) = transcendenceEngine.getSoulState(soulId);
+
+        stage;
+        blackKarma;
+        grayKarma;
+        mitochondrialPoints;
+        overEvolved;
+        lastAscensionTime;
+        interventionsPerformed;
+        interventionsReceived;
+
+        require(whiteKarma == 5, 'white karma mismatch');
+        require(soulTokens == (100 * 10 ** 18) + 25, 'soul token mismatch');
     }
 
     function test_transcendenceEngineWiring() public view {

@@ -81,6 +81,12 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
         _;
     }
 
+    modifier onlyInitializedSoul(uint256 soulId) {
+        require(soulForge.ownerOf(soulId) != address(0), 'Soul does not exist');
+        require(soulStates[soulId].initialized, 'Soul not initialized');
+        _;
+    }
+
     constructor(address _soulForge, address _karmicLedger, address _coolToken) Ownable(msg.sender) {
         soulForge = SoulForge(_soulForge);
         karmicLedger = KarmicLedger(_karmicLedger);
@@ -112,7 +118,7 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
         soul.initialized = true;
     }
 
-    function recordKarma(uint256 soulId, uint8 karmaType, uint256 amount) external onlyOwner {
+    function recordKarma(uint256 soulId, uint8 karmaType, uint256 amount) external onlyOwner onlyInitializedSoul(soulId) {
         require(karmaType <= 2, 'Invalid karma type');
         SoulState storage soul = soulStates[soulId];
         if (karmaType == 0) soul.whiteKarma += amount;
@@ -123,6 +129,7 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
 
     function attemptAscension(uint256 soulId) external onlySoulOwner(soulId) nonReentrant {
         SoulState storage soul = soulStates[soulId];
+        require(soul.initialized, 'Soul not initialized');
         require(uint256(soul.stage) < 7, 'Already at max stage');
         require(block.timestamp >= soul.lastAscensionTime + ASCENSION_LOCK, 'Ascension on cooldown');
 
@@ -169,6 +176,7 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
         require(teacherSoul != 0, 'No soul found');
 
         SoulState storage teacher = soulStates[teacherSoul];
+        require(teacher.initialized, 'Soul not initialized');
         require(
             teacher.stage == WorldlyState.GreatTeacher || teacher.stage == WorldlyState.Enlightened,
             'Not Great Teacher'
@@ -227,7 +235,8 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
     }
 
     function executeFairEmotions(uint256 targetSoul) internal {
-        emit FairEmotions(targetSoul, 0);
+        uint256 teacherSoul = soulForge.getSoulByWallet(msg.sender);
+        emit FairEmotions(targetSoul, teacherSoul);
     }
 
     function absorbTeacherShadow(uint256 teacherSoul) internal {
@@ -262,7 +271,7 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
         worldAnswers[msg.sender] = answer;
     }
 
-    function levelUpJob(uint256 soulId, uint256 jobId) external onlySoulOwner(soulId) {
+    function levelUpJob(uint256 soulId, uint256 jobId) external onlySoulOwner(soulId) onlyInitializedSoul(soulId) {
         require(jobId < 50, 'Invalid job');
         SoulState storage soul = soulStates[soulId];
         soul.jobLevels[jobId]++;
@@ -272,11 +281,11 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
         }
     }
 
-    function addMitochondrialPoints(uint256 soulId, uint256 points) external onlyOwner {
+    function addMitochondrialPoints(uint256 soulId, uint256 points) external onlyOwner onlyInitializedSoul(soulId) {
         soulStates[soulId].mitochondrialPoints += points;
     }
 
-    function earnSoulTokens(uint256 soulId, uint256 amount) external onlyOwner {
+    function earnSoulTokens(uint256 soulId, uint256 amount) external onlyOwner onlyInitializedSoul(soulId) {
         soulStates[soulId].soulTokens += amount;
     }
 
@@ -328,6 +337,7 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
 
     function canAscend(uint256 soulId) external view returns (bool) {
         SoulState storage soul = soulStates[soulId];
+        if (!soul.initialized) return false;
         if (uint256(soul.stage) >= 7) return false;
         if (block.timestamp < soul.lastAscensionTime + ASCENSION_LOCK) return false;
         bool pureIntention =

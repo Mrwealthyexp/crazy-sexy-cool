@@ -129,6 +129,11 @@ contract SoulForge is ERC721, ERC721Enumerable, Ownable, ReentrancyGuard {
         override(ERC721, ERC721Enumerable)
         returns (address)
     {
+        address from = _ownerOf(tokenId);
+        if (to != address(0) && to != from) {
+            require(balanceOf(to) == 0, 'Wallet already has soul');
+        }
+
         address previousOwner = super._update(to, tokenId, auth);
 
         if (previousOwner != address(0) && walletToSoul[previousOwner] == tokenId) {

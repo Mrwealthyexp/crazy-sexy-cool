@@ -44,7 +44,7 @@ contract CSCMarketplace is Ownable, IERC721Receiver, ReentrancyGuard {
         require(tokenContract != address(0), 'Invalid token contract');
         require(price > 0, 'Price must be > 0');
 
-        IERC721(tokenContract).transferFrom(msg.sender, address(this), tokenId);
+        IERC721(tokenContract).safeTransferFrom(msg.sender, address(this), tokenId);
 
         uint256 listingId = ++_listingIdCounter;
         listings[listingId] = Listing({
@@ -70,19 +70,17 @@ contract CSCMarketplace is Ownable, IERC721Receiver, ReentrancyGuard {
         uint256 charityAmount = (price * CHARITY_SHARE) / FEE_DENOMINATOR;
         uint256 remainder = price - sellerBaseAmount - platformFeeAmount - burnAmount - charityAmount;
         uint256 sellerAmount = sellerBaseAmount + remainder;
+        uint256 escrowAmount = price - burnAmount;
 
         listing.active = false;
 
-        uint256 balanceBefore = coolToken.balanceOf(address(this));
-        require(coolToken.transferFrom(msg.sender, address(this), price), 'Payment transfer failed');
-        uint256 receivedAmount = coolToken.balanceOf(address(this)) - balanceBefore;
-        require(receivedAmount == price, 'Unsupported fee token');
+        require(coolToken.transferFrom(msg.sender, address(this), escrowAmount), 'Payment transfer failed');
+        require(coolToken.burnFrom(msg.sender, burnAmount), 'Burn failed');
         require(coolToken.transfer(listing.seller, sellerAmount), 'Seller transfer failed');
         require(coolToken.transfer(treasury, platformFeeAmount), 'Treasury transfer failed');
         require(coolToken.transfer(charityPool, charityAmount), 'Charity transfer failed');
-        require(coolToken.burn(burnAmount), 'Burn failed');
 
-        IERC721(listing.tokenContract).transferFrom(address(this), msg.sender, listing.tokenId);
+        IERC721(listing.tokenContract).safeTransferFrom(address(this), msg.sender, listing.tokenId);
 
         emit ItemSold(listingId, msg.sender, price);
     }
@@ -93,7 +91,7 @@ contract CSCMarketplace is Ownable, IERC721Receiver, ReentrancyGuard {
         require(listing.seller == msg.sender || msg.sender == owner(), 'Not authorized');
 
         listing.active = false;
-        IERC721(listing.tokenContract).transferFrom(address(this), listing.seller, listing.tokenId);
+        IERC721(listing.tokenContract).safeTransferFrom(address(this), listing.seller, listing.tokenId);
 
         emit ListingCancelled(listingId);
     }
