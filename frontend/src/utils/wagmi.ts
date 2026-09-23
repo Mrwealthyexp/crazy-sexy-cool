@@ -5,11 +5,8 @@ import { injected, walletConnect } from 'wagmi/connectors'
 const walletConnectProjectId = import.meta.env.VITE_WALLETCONNECT_PROJECT_ID?.trim()
 const rpcUrl = import.meta.env.VITE_RPC_URL?.trim()
 
-const connectors = [injected()]
-
-if (walletConnectProjectId) {
-  connectors.unshift(
-    walletConnect({
+const walletConnectConnector = walletConnectProjectId
+  ? walletConnect({
       projectId: walletConnectProjectId,
       showQrModal: true,
       metadata: {
@@ -18,9 +15,10 @@ if (walletConnectProjectId) {
         url: 'https://crazysexycool.metaverse',
         icons: ['https://avatars.githubusercontent.com/u/9919?s=200&v=4'],
       },
-    }),
-  )
-}
+    })
+  : null
+
+const connectors = [injected(), ...(walletConnectConnector ? [walletConnectConnector] : [])]
 
 export const requiredChain = baseSepolia
 
