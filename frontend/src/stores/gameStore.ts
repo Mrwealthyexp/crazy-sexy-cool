@@ -92,6 +92,10 @@ const initialCombatProfile: PlayerCombatProfile = {
 
 const initialReadiness = getCombatReadiness(initialCombatProfile)
 
+function getSafeZones(zones: Zone[]) {
+  return zones.length > 0 ? zones : fallbackZones
+}
+
 export const useGameStore = create<GameStore>((set) => ({
   ...initialGameState,
   combatProfile: initialCombatProfile,
@@ -113,7 +117,7 @@ export const useGameStore = create<GameStore>((set) => ({
         combatProfile: overview.combatProfile,
         licenseTiers: overview.licenseTiers,
         consequenceRules: overview.consequenceRules,
-        zones: overview.zones,
+        zones: getSafeZones(overview.zones),
         statusLabel: overview.readiness.statusLabel,
         statusDescription: overview.readiness.statusDescription,
         isLoading: false,
@@ -141,7 +145,7 @@ export const useGameStore = create<GameStore>((set) => ({
         combatProfile: overview.combatProfile,
         licenseTiers: overview.licenseTiers,
         consequenceRules: overview.consequenceRules,
-        zones: overview.zones,
+        zones: getSafeZones(overview.zones),
         statusLabel: overview.readiness.statusLabel,
         statusDescription: overview.readiness.statusDescription,
         isLoading: false,

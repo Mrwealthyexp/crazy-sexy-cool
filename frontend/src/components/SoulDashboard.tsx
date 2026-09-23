@@ -30,9 +30,10 @@ export default function SoulDashboard() {
         <button
           className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
             combatProfile.combatModeEquipped
-              ? 'bg-rose-500 text-white hover:bg-rose-400'
-              : 'bg-cyan-400 text-gray-950 hover:bg-cyan-300'
-          }`}
+              ? 'bg-rose-500 text-white'
+              : 'bg-cyan-400 text-gray-950'
+          } ${isLoading ? 'cursor-not-allowed opacity-70' : combatProfile.combatModeEquipped ? 'hover:bg-rose-400' : 'hover:bg-cyan-300'}`}
+          aria-busy={isLoading}
           disabled={isLoading}
           onClick={() => void toggleCombatMode()}
           type="button"
