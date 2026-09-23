@@ -31,12 +31,18 @@ export default function CombatLicensePanel() {
               </h3>
               <span
                 className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                  tier.eligible
+                  tier.unlocked
+                    ? 'bg-sky-500/15 text-sky-300'
+                    : tier.eligible
                     ? 'bg-emerald-500/15 text-emerald-300'
                     : 'bg-amber-500/15 text-amber-300'
                 }`}
               >
-                {tier.eligible ? 'Ready to unlock' : 'Requirements pending'}
+                {tier.unlocked
+                  ? 'Unlocked'
+                  : tier.eligible
+                    ? 'Ready to unlock'
+                    : 'Requirements pending'}
               </span>
             </div>
 

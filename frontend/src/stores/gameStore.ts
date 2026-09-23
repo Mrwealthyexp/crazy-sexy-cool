@@ -38,6 +38,7 @@ export interface ConsequenceRule {
 
 export interface TierEvaluation extends LicenseTier {
   eligible: boolean
+  unlocked: boolean
   requirements: Array<{ label: string; met: boolean }>
 }
 
@@ -217,6 +218,7 @@ export function evaluateLicenseTiers(
     return {
       ...tier,
       eligible: requirements.every((requirement) => requirement.met),
+      unlocked: profile.currentTier >= tier.tier,
       requirements,
     }
   })
