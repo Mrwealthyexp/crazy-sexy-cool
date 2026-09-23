@@ -65,6 +65,7 @@ contract TranscendenceEngine {
     }
 
     function createArtifact(string calldata zoneId) external onlySoulOwner {
+        _requireSupportedZone(zoneId);
         uint256 soulId = soulForge.soulIdOf(msg.sender);
         soulForge.shiftWorldState(soulId, SoulForge.WorldState.Sexy);
         soulForge.adjustFocus(soulId, 15);
@@ -104,6 +105,7 @@ contract TranscendenceEngine {
     }
 
     function engageCombat(string calldata zoneId, bool honorable) external onlySoulOwner {
+        _requireSupportedZone(zoneId);
         uint256 soulId = soulForge.soulIdOf(msg.sender);
         SoulForge.SoulIdentity memory soul = soulForge.getSoulByOwner(msg.sender);
         if (!soul.combatLicensed) revert CombatLicenseRequired();
@@ -120,6 +122,7 @@ contract TranscendenceEngine {
     function askWorldQuestion(string calldata question, string calldata answer) external onlySoulOwner {
         SoulForge.SoulIdentity memory soul = soulForge.getSoulByOwner(msg.sender);
         if (!soul.transcended) revert TranscendenceRequired();
+        if (weatherOracle.answerExpiresAt() > block.timestamp) revert ActiveWorldQuestion();
 
         weatherOracle.setWorldQuestion(question, answer, 1 days);
         emit WorldQuestionAsked(msg.sender, question, answer);
@@ -170,6 +173,18 @@ contract TranscendenceEngine {
         _;
     }
 
+    function _requireSupportedZone(string calldata zoneId) internal pure {
+        bytes32 zoneKey = keccak256(bytes(zoneId));
+        if (
+            zoneKey != keccak256(bytes("soul-forge"))
+                && zoneKey != keccak256(bytes("aeterna-gate"))
+                && zoneKey != keccak256(bytes("shadow-arena"))
+                && zoneKey != keccak256(bytes("oracle-district"))
+        ) {
+            revert UnsupportedZone();
+        }
+    }
+
     error SoulAlreadyInitialized();
     error SoulMissing();
     error InvalidMasteryScore();
@@ -177,5 +192,7 @@ contract TranscendenceEngine {
     error InsufficientReputation();
     error CombatLicenseRequired();
     error TranscendenceRequired();
+    error ActiveWorldQuestion();
+    error UnsupportedZone();
     error NotReadyToTranscend(string reason);
 }

@@ -62,23 +62,32 @@ export default function WorldMap() {
                   disabled={loading || !player?.soul}
                   onClick={() =>
                     runAction({
-                      type: zone.licenseRequired ? 'engage-combat' : 'create-artifact',
+                      type: zone.primaryAction,
                       zoneId: zone.id,
-                      payload: zone.licenseRequired ? { honorable: true } : undefined,
+                      payload:
+                        zone.primaryAction === 'engage-combat'
+                          ? { honorable: true }
+                          : undefined,
                     })
                   }
                   type="button"
                 >
-                  {zone.licenseRequired ? 'Enter combat loop' : 'Create here'}
+                  {zone.primaryAction === 'engage-combat'
+                    ? 'Enter combat loop'
+                    : zone.primaryAction === 'meditate'
+                      ? 'Meditate here'
+                      : zone.primaryAction === 'forge-soul'
+                        ? 'Forge here'
+                        : 'Create here'}
                 </button>
                 {zone.id === 'oracle-district' ? (
                   <button
                     className="secondary-button"
                     disabled={loading || !player?.soul}
-                    onClick={() => runAction({ type: 'meditate' })}
+                    onClick={() => runAction({ type: 'transcend' })}
                     type="button"
                   >
-                    Meditate here
+                    Attempt transcendence
                   </button>
                 ) : null}
               </div>

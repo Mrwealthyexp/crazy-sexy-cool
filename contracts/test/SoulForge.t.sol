@@ -48,6 +48,13 @@ contract SoulForgeTest is Test {
         assertEq(coolToken.balanceOf(player), 100 ether);
     }
 
+    function testInitializeSoulRejectsInvalidBirthMonth() public {
+        vm.startPrank(player);
+        vm.expectRevert(SoulForge.InvalidBirthMonth.selector);
+        engine.initializeSoul("Nova", "visionary", 13, keccak256("nova-tba"));
+        vm.stopPrank();
+    }
+
     function testCombatRequiresLicense() public {
         vm.startPrank(player);
         engine.initializeSoul("Nova", "visionary", 7, keccak256("nova-tba"));

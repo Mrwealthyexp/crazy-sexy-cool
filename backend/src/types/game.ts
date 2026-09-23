@@ -12,6 +12,7 @@ export interface Zone {
   name: string
   coordinates: [number, number]
   description: string
+  primaryAction: 'forge-soul' | 'create-artifact' | 'engage-combat' | 'meditate'
   licenseRequired: boolean
   climate: ZoneClimate
   lore: string

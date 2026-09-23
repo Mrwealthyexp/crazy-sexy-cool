@@ -171,6 +171,9 @@ app.post('/game/action', (req, res) => {
         }
 
         const birthMonth = action.payload?.birthMonth ?? 1
+        if (birthMonth < 1 || birthMonth > 12) {
+          throw new Error('Birth month must be between 1 and 12.')
+        }
         player.soul = {
           displayName: action.payload?.displayName?.trim() || 'Unnamed Soul',
           temperament: action.payload?.temperament?.trim() || 'Adaptive',

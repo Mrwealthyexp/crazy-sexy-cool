@@ -44,7 +44,11 @@ export async function submitGameAction(action: GameActionRequest): Promise<GameA
       body: JSON.stringify(action),
     })
 
-    return (await response.json()) as GameActionResult
+    const payload = (await response.json()) as GameActionResult
+    if (!response.ok) {
+      return { ...payload, success: false }
+    }
+    return payload
   } catch {
     return {
       success: false,

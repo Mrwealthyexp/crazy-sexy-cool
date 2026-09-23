@@ -29,9 +29,8 @@ const initialForgeDraft: ForgeDraft = {
   birthMonth: 7,
 }
 
-function mergeResponse(state: Pick<GameStore, 'player' | 'world' | 'message' | 'error'>, payload: GameDataResponse | GameActionResult) {
+function mergeResponse(payload: GameDataResponse | GameActionResult) {
   return {
-    ...state,
     player: payload.player,
     world: payload.world,
   }
@@ -52,8 +51,8 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const wallet = get().wallet.trim() || '0xguest'
     set({ loading: true, error: null })
     const data = await fetchGameData(wallet)
-    set((state) => ({
-      ...mergeResponse(state, data),
+    set(() => ({
+      ...mergeResponse(data),
       wallet,
       message: data.player.soul ? 'World state synchronized.' : 'Soul forge ready.',
       loading: false,
@@ -65,17 +64,18 @@ export const useGameStore = create<GameStore>((set, get) => ({
     const response = await submitGameAction({ ...request, wallet })
 
     if (!response.success) {
-      set((state) => ({
-        ...mergeResponse(state, response),
+      set(() => ({
+        ...mergeResponse(response),
         wallet,
+        message: response.message,
         error: response.message,
         loading: false,
       }))
       return
     }
 
-    set((state) => ({
-      ...mergeResponse(state, response),
+    set(() => ({
+      ...mergeResponse(response),
       wallet,
       message: response.message,
       error: null,
