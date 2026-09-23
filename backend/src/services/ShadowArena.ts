@@ -1,20 +1,33 @@
+import type { PlayerState, Zone } from '../../../shared/game'
+
+export interface CombatDecision {
+  allowed: boolean
+  reason: string
+}
+
 /**
  * ShadowArena Service
- * Handles game arena and battle mechanics
+ * Handles zone-based combat eligibility
  */
 export class ShadowArena {
-  async initializeBattle(players: any[]) {
-    // Initialize battle logic
-    return {}
-  }
+  canEngageCombat(zone: Zone, player: PlayerState): CombatDecision {
+    if (zone.combatMode === 'none') {
+      return {
+        allowed: false,
+        reason: `${zone.name} is a protected sanctuary. Combat is disabled in this zone.`,
+      }
+    }
 
-  async processBattleAction(action: any) {
-    // Process battle action
-    return {}
-  }
+    if (zone.combatMode === 'licensed' && !player.hasCombatLicense) {
+      return {
+        allowed: false,
+        reason: `${zone.name} requires an active combat license.`,
+      }
+    }
 
-  async resolveBattle() {
-    // Resolve battle outcome
-    return {}
+    return {
+      allowed: true,
+      reason: `Combat authorized in ${zone.name}.`,
+    }
   }
 }

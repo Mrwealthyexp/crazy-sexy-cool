@@ -30,3 +30,46 @@ This is not a game. It is a **mirror for the soul**.
 
 ## 🏗️ Architecture
 
+- `shared/game.ts`: Canonical game state + action contract used by backend and frontend
+- `backend`: Express API for game state and action processing
+- `frontend`: React UI for dashboard, soul forge controls, and world map interactions
+- `contracts`: Foundry smart contracts and scripts
+
+---
+
+## 🚀 MVP Vertical Slice (Zone Entry + Combat Gating)
+
+### Backend endpoints
+- `GET /game/data` — Returns current game state
+- `POST /game/action` — Accepts actions:
+  - `ENTER_ZONE`
+  - `ATTEMPT_COMBAT`
+  - `TOGGLE_COMBAT_LICENSE`
+
+### Combat rules
+- `none`: Combat is blocked
+- `licensed`: Combat requires active license
+- `open`: Combat is always allowed
+
+### Run locally
+1. Backend:
+   - `cd /home/runner/work/crazy-sexy-cool/crazy-sexy-cool/backend`
+   - `npm install`
+   - `npm run dev`
+2. Frontend (new terminal):
+   - `cd /home/runner/work/crazy-sexy-cool/crazy-sexy-cool/frontend`
+   - `npm install`
+   - `npm run dev`
+3. Open the Vite URL and verify:
+   - Load game data successfully
+   - Enter a different zone
+   - Attempt combat in a `none` zone (blocked)
+   - Attempt combat in a `licensed` zone without license (blocked)
+   - Toggle license and attempt combat again (allowed)
+
+---
+
+## 🧪 Validation
+
+- Backend typecheck/build: `npm run build` (inside `backend`)
+- Frontend typecheck/build: `npm run build` (inside `frontend`)
