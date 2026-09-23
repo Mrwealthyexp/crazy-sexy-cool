@@ -90,6 +90,28 @@ function createLocalSnapshot(currentMoonPhase: MoonPhase = defaultMoonPhase): Ga
   }
 }
 
+function createOfflinePhaseSnapshot(state: GameStoreState, currentMoonPhase: MoonPhase): GameSnapshot {
+  const teacher = state.karma >= 12 && state.souls >= 8 && state.wisdom >= 8
+  const completedQuestIds = new Set(
+    state.quests.filter((quest) => quest.status === 'completed').map((quest) => quest.id),
+  )
+
+  return {
+    playerLevel: state.playerLevel,
+    karma: state.karma,
+    souls: state.souls,
+    wisdom: state.wisdom,
+    currentMoonPhase,
+    isGreatTeacher: teacher,
+    quests: createLocalQuestSet(currentMoonPhase).map((quest) =>
+      completedQuestIds.has(quest.id) ? { ...quest, status: 'completed' } : quest,
+    ),
+    zones: createZoneSnapshots(currentMoonPhase, teacher),
+    ledgerStatus: state.ledgerStatus,
+    lastBattle: state.lastBattle,
+  }
+}
+
 function applySnapshot(set: (partial: Partial<GameStoreState>) => void, snapshot: GameSnapshot, connection: ConnectionState) {
   set({
     playerLevel: snapshot.playerLevel,
@@ -144,8 +166,11 @@ export const useGameStore = create<GameStoreState>((set) => ({
       const snapshot = await fetchGameState()
       applySnapshot(set, snapshot, 'connected')
     } catch (error) {
-      applySnapshot(set, createLocalSnapshot(), 'offline')
-      set({ error: error instanceof Error ? error.message : 'Unable to load game state' })
+      set((state) => ({
+        ...state,
+        connection: 'offline',
+        error: error instanceof Error ? error.message : 'Unable to load game state',
+      }))
     } finally {
       set({ loading: false })
     }
@@ -156,9 +181,24 @@ export const useGameStore = create<GameStoreState>((set) => ({
       const snapshot = await updateMoonPhase(phase)
       applySnapshot(set, snapshot, 'connected')
     } catch (error) {
-      const fallback = createLocalSnapshot(phase)
-      applySnapshot(set, fallback, 'offline')
-      set({ error: error instanceof Error ? error.message : 'Unable to update moon phase' })
+      set((state) => {
+        const fallback = createOfflinePhaseSnapshot(state, phase)
+        return {
+          ...state,
+          playerLevel: fallback.playerLevel,
+          karma: fallback.karma,
+          souls: fallback.souls,
+          wisdom: fallback.wisdom,
+          currentMoonPhase: fallback.currentMoonPhase,
+          isGreatTeacher: fallback.isGreatTeacher,
+          quests: fallback.quests,
+          zones: fallback.zones,
+          ledgerStatus: fallback.ledgerStatus,
+          lastBattle: fallback.lastBattle,
+          connection: 'offline',
+          error: error instanceof Error ? error.message : 'Unable to update moon phase',
+        }
+      })
     } finally {
       set({ loading: false })
     }

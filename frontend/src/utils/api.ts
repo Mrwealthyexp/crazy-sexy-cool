@@ -71,7 +71,7 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   try {
     return await performRequest<T>(PRIMARY_API_URL, path, init)
   } catch (error) {
-    if (!FALLBACK_API_URL) {
+    if (!FALLBACK_API_URL || !(error instanceof TypeError)) {
       throw error
     }
 
