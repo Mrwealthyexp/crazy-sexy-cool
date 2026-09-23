@@ -123,6 +123,7 @@ contract TranscendenceEngine {
         SoulForge.SoulIdentity memory soul = soulForge.getSoulByOwner(msg.sender);
         if (!soul.transcended) revert TranscendenceRequired();
         if (weatherOracle.answerExpiresAt() > block.timestamp) revert ActiveWorldQuestion();
+        if (bytes(question).length == 0 || bytes(answer).length == 0) revert EmptyWorldQuestion();
 
         weatherOracle.setWorldQuestion(question, answer, 1 days);
         emit WorldQuestionAsked(msg.sender, question, answer);
@@ -193,6 +194,7 @@ contract TranscendenceEngine {
     error CombatLicenseRequired();
     error TranscendenceRequired();
     error ActiveWorldQuestion();
+    error EmptyWorldQuestion();
     error UnsupportedZone();
     error NotReadyToTranscend(string reason);
 }

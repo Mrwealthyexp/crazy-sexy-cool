@@ -38,17 +38,31 @@ export async function fetchGameData(wallet: string): Promise<GameDataResponse> {
 
 export async function submitGameAction(action: GameActionRequest): Promise<GameActionResult> {
   try {
+    const fallback = fallbackGameData(action.wallet)
     const response = await fetch(`${API_URL}/game/action`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(action),
     })
 
-    const payload = (await response.json()) as GameActionResult
-    if (!response.ok) {
-      return { ...payload, success: false }
+    if (response.ok) {
+      return (await response.json()) as GameActionResult
     }
-    return payload
+
+    let payload: Partial<GameActionResult> = {}
+    try {
+      payload = (await response.json()) as GameActionResult
+    } catch {
+      payload = {}
+    }
+
+    return {
+      success: false,
+      message: payload.message ?? 'Action failed.',
+      player: payload.player ?? fallback.player,
+      world: payload.world ?? fallback.world,
+      insight: payload.insight,
+    }
   } catch {
     return {
       success: false,

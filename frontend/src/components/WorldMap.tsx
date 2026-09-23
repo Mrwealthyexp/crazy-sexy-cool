@@ -84,7 +84,7 @@ export default function WorldMap() {
                   <button
                     className="secondary-button"
                     disabled={loading || !player?.soul}
-                    onClick={() => runAction({ type: 'transcend' })}
+                    onClick={() => runAction({ type: 'transcend', zoneId: zone.id })}
                     type="button"
                   >
                     Attempt transcendence

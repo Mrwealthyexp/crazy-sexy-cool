@@ -282,6 +282,7 @@ app.post('/game/action', (req, res) => {
         soul.transcended = true
         soul.worldState = 'cool'
         player.coolBalance += 250
+        player.activeZoneId = action.zoneId ?? 'oracle-district'
         worldState.currentQuestion = 'What heals the city?'
         worldState.collectiveAnswer = 'Collective honesty.'
         worldState.answerExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString()

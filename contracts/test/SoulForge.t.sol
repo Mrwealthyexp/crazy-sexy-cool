@@ -101,4 +101,26 @@ contract SoulForgeTest is Test {
         assertEq(weatherOracle.worldQuestion(), "What heals the city?");
         assertEq(weatherOracle.collectiveAnswer(), "Collective honesty.");
     }
+
+    function testActiveWorldQuestionCannotBeOverwrittenBeforeExpiry() public {
+        vm.startPrank(player);
+        engine.initializeSoul("Nova", "visionary", 7, keccak256("nova-tba"));
+
+        engine.meditate();
+        engine.meditate();
+        engine.meditate();
+        engine.createArtifact("soul-forge");
+        engine.createArtifact("aeterna-gate");
+        engine.createArtifact("shadow-arena");
+        engine.createArtifact("oracle-district");
+        engine.completeBounty(90);
+        engine.grantCombatLicense();
+        engine.engageCombat("shadow-arena", true);
+        engine.transcend();
+        engine.askWorldQuestion("What heals the city?", "Collective honesty.");
+
+        vm.expectRevert(TranscendenceEngine.ActiveWorldQuestion.selector);
+        engine.askWorldQuestion("Who leads next?", "Those who listen.");
+        vm.stopPrank();
+    }
 }
