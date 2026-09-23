@@ -98,4 +98,26 @@ contract CoolTokenTest is Test {
         assertEq(token.balanceOf(treasury), INITIAL_SUPPLY - 12 ether);
         assertEq(token.allowance(treasury, alice), 8 ether);
     }
+
+    function test_increaseAndDecreaseAllowance() public {
+        vm.prank(treasury);
+        token.approve(alice, 10 ether);
+
+        vm.prank(treasury);
+        token.increaseAllowance(alice, 5 ether);
+        assertEq(token.allowance(treasury, alice), 15 ether);
+
+        vm.prank(treasury);
+        token.decreaseAllowance(alice, 4 ether);
+        assertEq(token.allowance(treasury, alice), 11 ether);
+    }
+
+    function test_decreaseAllowanceRevertsBelowZero() public {
+        vm.prank(treasury);
+        token.approve(alice, 3 ether);
+
+        vm.expectRevert(CoolToken.InsufficientAllowance.selector);
+        vm.prank(treasury);
+        token.decreaseAllowance(alice, 4 ether);
+    }
 }
