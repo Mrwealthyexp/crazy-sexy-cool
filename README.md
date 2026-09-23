@@ -30,3 +30,32 @@ This is not a game. It is a **mirror for the soul**.
 
 ## 🏗️ Architecture
 
+- **Contracts**: Foundry-based Solidity contracts in `/contracts`
+- **Frontend**: React + TypeScript client in `/frontend`
+- **Backend**: Node/TypeScript API services in `/backend`
+
+## 🚀 Smart Contract Deployment (Base Sepolia)
+
+1. Copy `/contracts/.env.example` to `/contracts/.env` and fill values.
+2. From `/contracts`, run:
+
+```bash
+forge script script/Deploy.s.sol:Deploy \
+  --rpc-url $BASE_SEPOLIA_RPC \
+  --broadcast \
+  --verify \
+  --etherscan-api-key $BASESCAN_API_KEY
+```
+
+## 🔌 WalletConnect v2 Setup (Frontend)
+
+1. Copy `/frontend/.env.example` to `/frontend/.env`.
+2. Set:
+   - `VITE_WALLETCONNECT_PROJECT_ID`
+   - `VITE_RPC_URL` (optional override)
+3. From `/frontend`, run:
+
+```bash
+npm install
+npm run dev
+```
