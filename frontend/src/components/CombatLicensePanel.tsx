@@ -55,7 +55,7 @@ export default function CombatLicensePanel() {
               {tier.requirements.map((requirement) => (
                 <li key={requirement.label} className="flex gap-2">
                   <span className={requirement.met ? 'text-emerald-300' : 'text-rose-300'}>
-                    {requirement.met ? '✓' : '✕'}
+                    {requirement.met ? '✓ Met' : '✕ Not met'}
                   </span>
                   <span>{requirement.label}</span>
                 </li>

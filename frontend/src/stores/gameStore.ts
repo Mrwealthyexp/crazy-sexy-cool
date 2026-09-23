@@ -1,6 +1,10 @@
 import { create } from 'zustand'
 import { fallbackZones, type Zone } from '../data/zones'
-import { fetchCombatOverview, setCombatMode } from '../utils/api'
+import {
+  fetchCombatOverview,
+  setCombatMode,
+  type CombatOverviewResponse,
+} from '../utils/api'
 
 export interface GameState {
   playerLevel: number
@@ -96,6 +100,31 @@ function getSafeZones(zones: Zone[]) {
   return zones.length > 0 ? zones : fallbackZones
 }
 
+function applyOverview(
+  overview: CombatOverviewResponse,
+): Pick<
+  GameStore,
+  | keyof GameState
+  | 'combatProfile'
+  | 'licenseTiers'
+  | 'consequenceRules'
+  | 'zones'
+  | 'statusLabel'
+  | 'statusDescription'
+  | 'isLoading'
+> {
+  return {
+    ...overview.gameState,
+    combatProfile: overview.combatProfile,
+    licenseTiers: overview.licenseTiers,
+    consequenceRules: overview.consequenceRules,
+    zones: getSafeZones(overview.zones),
+    statusLabel: overview.readiness.statusLabel,
+    statusDescription: overview.readiness.statusDescription,
+    isLoading: false,
+  }
+}
+
 export const useGameStore = create<GameStore>((set) => ({
   ...initialGameState,
   combatProfile: initialCombatProfile,
@@ -112,16 +141,7 @@ export const useGameStore = create<GameStore>((set) => ({
     try {
       const overview = await fetchCombatOverview()
 
-      set({
-        ...overview.gameState,
-        combatProfile: overview.combatProfile,
-        licenseTiers: overview.licenseTiers,
-        consequenceRules: overview.consequenceRules,
-        zones: getSafeZones(overview.zones),
-        statusLabel: overview.readiness.statusLabel,
-        statusDescription: overview.readiness.statusDescription,
-        isLoading: false,
-      })
+      set(applyOverview(overview))
     } catch (error) {
       set({
         isLoading: false,
@@ -140,16 +160,7 @@ export const useGameStore = create<GameStore>((set) => ({
         !useGameStore.getState().combatProfile.combatModeEquipped,
       )
 
-      set({
-        ...overview.gameState,
-        combatProfile: overview.combatProfile,
-        licenseTiers: overview.licenseTiers,
-        consequenceRules: overview.consequenceRules,
-        zones: getSafeZones(overview.zones),
-        statusLabel: overview.readiness.statusLabel,
-        statusDescription: overview.readiness.statusDescription,
-        isLoading: false,
-      })
+      set(applyOverview(overview))
     } catch (error) {
       set({
         isLoading: false,

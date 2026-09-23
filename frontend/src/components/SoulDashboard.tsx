@@ -34,6 +34,7 @@ export default function SoulDashboard() {
               : 'bg-cyan-400 text-gray-950'
           } ${isLoading ? 'cursor-not-allowed opacity-70' : combatProfile.combatModeEquipped ? 'hover:bg-rose-400' : 'hover:bg-cyan-300'}`}
           aria-busy={isLoading}
+          aria-pressed={combatProfile.combatModeEquipped}
           disabled={isLoading}
           onClick={() => void toggleCombatMode()}
           type="button"
