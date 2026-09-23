@@ -96,7 +96,18 @@ app.post('/game/action', (req, res) => {
   }
 
   if (action.type === 'ATTEMPT_COMBAT') {
-    const decision = shadowArena.canEngageCombat(zone, gameState.player)
+    if (action.zoneId && action.zoneId !== gameState.player.currentZoneId) {
+      respondWithAction(res, false, 'Enter the selected zone before attempting combat.', 400)
+      return
+    }
+
+    const currentZone = findZone(gameState.player.currentZoneId)
+    if (!currentZone) {
+      respondWithAction(res, false, 'Current zone is invalid. Please re-enter a valid zone.', 500)
+      return
+    }
+
+    const decision = shadowArena.canEngageCombat(currentZone, gameState.player)
 
     if (!decision.allowed) {
       respondWithAction(res, false, decision.reason, 403)
@@ -108,7 +119,7 @@ app.post('/game/action', (req, res) => {
       karma: gameState.player.karma + 5,
       souls: gameState.player.souls + 1,
       level: Math.min(gameState.player.level + 1, 99),
-      worldlyState: zone.combatMode === 'open' ? 'crazy' : 'cool',
+      worldlyState: currentZone.combatMode === 'open' ? 'crazy' : 'cool',
     }
 
     setGameState({ ...gameState, player })

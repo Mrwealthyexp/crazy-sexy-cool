@@ -53,11 +53,11 @@ This is not a game. It is a **mirror for the soul**.
 
 ### Run locally
 1. Backend:
-   - `cd /home/runner/work/crazy-sexy-cool/crazy-sexy-cool/backend`
+   - `cd backend`
    - `npm install`
    - `npm run dev`
 2. Frontend (new terminal):
-   - `cd /home/runner/work/crazy-sexy-cool/crazy-sexy-cool/frontend`
+   - `cd frontend`
    - `npm install`
    - `npm run dev`
 3. Open the Vite URL and verify:
