@@ -1,7 +1,8 @@
 import type { MoonPhase } from '../data/lunarPhases'
 import type { ZoneSnapshot } from '../data/zones'
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3001'
+const PRIMARY_API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000'
+const FALLBACK_API_URL = PRIMARY_API_URL === 'http://localhost:3000' ? 'http://localhost:3001' : undefined
 
 export interface QuestReward {
   karma: number
@@ -47,8 +48,8 @@ export interface GameSnapshot {
   lastBattle?: BattleResult
 }
 
-async function request<T>(path: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(`${API_URL}${path}`, {
+async function performRequest<T>(baseUrl: string, path: string, init?: RequestInit): Promise<T> {
+  const response = await fetch(`${baseUrl}${path}`, {
     headers: {
       'Content-Type': 'application/json',
       ...(init?.headers ?? {}),
@@ -64,6 +65,18 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   }
 
   return (await response.json()) as T
+}
+
+async function request<T>(path: string, init?: RequestInit): Promise<T> {
+  try {
+    return await performRequest<T>(PRIMARY_API_URL, path, init)
+  } catch (error) {
+    if (!FALLBACK_API_URL) {
+      throw error
+    }
+
+    return performRequest<T>(FALLBACK_API_URL, path, init)
+  }
 }
 
 export function fetchGameState() {

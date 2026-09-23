@@ -223,7 +223,7 @@ export const useGameStore = create<GameStoreState>((set) => ({
     } catch (error) {
       set((state) => {
         const zone = state.zones.find((entry) => entry.id === zoneId)
-        if (!zone || !zone.pvp) {
+        if (!zone || !zone.pvp || zone.access !== 'open') {
           return {
             loading: false,
             error: error instanceof Error ? error.message : 'Battle unavailable in this zone',

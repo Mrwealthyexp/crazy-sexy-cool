@@ -199,8 +199,8 @@ export class GameWorld {
       throw new Error('PvP is not enabled in this zone')
     }
 
-    if (zone.access === 'teacher-only') {
-      throw new Error('Only Great Teachers can enter this zone right now')
+    if (zone.access !== 'open') {
+      throw new Error('Zone must be open before PvP can resolve here')
     }
 
     const result = this.shadowArena.resolveBattle({
