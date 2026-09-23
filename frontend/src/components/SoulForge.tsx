@@ -120,7 +120,12 @@ export default function SoulForge() {
       <div className="mt-6 flex flex-wrap items-center gap-3">
         <button
           className="rounded-full bg-fuchsia-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-fuchsia-400"
-          onClick={() => createSoul(form)}
+          onClick={() =>
+            createSoul({
+              ...form,
+              signatureTimestamp: new Date().toISOString(),
+            })
+          }
           type="button"
         >
           Mint local soul preview

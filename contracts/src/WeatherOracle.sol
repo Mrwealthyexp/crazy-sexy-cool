@@ -10,6 +10,7 @@ import {OwnableLite} from "./utils/OwnableLite.sol";
 contract WeatherOracle is OwnableLite {
     error UnauthorizedController(address account);
     error ZeroAddress();
+    error EmptyZoneId();
 
     enum Weather {
         Clear,
@@ -76,6 +77,10 @@ contract WeatherOracle is OwnableLite {
         MoonPhase moonPhase,
         string calldata narrative
     ) external onlyController {
+        if (bytes(zoneId).length == 0) {
+            revert EmptyZoneId();
+        }
+
         bytes32 key = zoneKey(zoneId);
         _zoneWeather[key] = ZoneWeather({
             weather: weather,

@@ -125,6 +125,7 @@ contract TranscendenceEngine is OwnableLite {
 
         initialized[soulId] = true;
         _souls[soulId].stage = uint8(Stage.Unknowing);
+        karmicLedger.registerSoul(soulId);
         coolToken.mint(soulForge.ownerOf(soulId), 1_000 ether);
 
         emit SoulInitialized(soulId, soulForge.ownerOf(soulId));
@@ -303,7 +304,7 @@ contract TranscendenceEngine is OwnableLite {
         if (!_souls[soulId].isEnlightened) {
             revert OnlyEnlightened(soulId);
         }
-        require(block.timestamp > lastWorldQuestionAskedAt[soulId] + 30 days, "Too soon");
+        require(block.timestamp >= lastWorldQuestionAskedAt[soulId] + 30 days, "Too soon");
 
         worldQuestion = question;
         lastWorldQuestionAskedAt[soulId] = block.timestamp;

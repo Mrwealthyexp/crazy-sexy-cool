@@ -77,6 +77,7 @@ export interface SoulProfile {
   isGreatTeacher: boolean
   isEnlightened: boolean
   lastWorldQuestion?: string
+  lastWorldQuestionAt?: number
 }
 
 export interface StageDefinition {

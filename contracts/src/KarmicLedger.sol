@@ -11,6 +11,7 @@ contract KarmicLedger is OwnableLite {
     error UnauthorizedScribe(address account);
     error SoulNotFound(uint256 soulId);
     error ZeroAddress();
+    error SoulAlreadyRegistered(uint256 soulId);
 
     enum KarmaType {
         White,
@@ -34,9 +35,11 @@ contract KarmicLedger is OwnableLite {
 
     mapping(uint256 => KarmaBalance) private _balances;
     mapping(uint256 => KarmaEntry[]) private _entries;
+    mapping(uint256 => bool) public registeredSouls;
     mapping(address => bool) public scribes;
 
     event ScribeUpdated(address indexed account, bool isScribe);
+    event SoulRegistered(uint256 indexed soulId);
     event KarmaRecorded(
         uint256 indexed soulId,
         KarmaType indexed karmaType,
@@ -70,7 +73,7 @@ contract KarmicLedger is OwnableLite {
         int256 soulDelta,
         string calldata reason
     ) external onlyScribe {
-        if (soulId == 0) {
+        if (soulId == 0 || !registeredSouls[soulId]) {
             revert SoulNotFound(soulId);
         }
 
@@ -97,11 +100,23 @@ contract KarmicLedger is OwnableLite {
     }
 
     function karmaOf(uint256 soulId) external view returns (KarmaBalance memory) {
-        if (soulId == 0) {
+        if (soulId == 0 || !registeredSouls[soulId]) {
             revert SoulNotFound(soulId);
         }
 
         return _balances[soulId];
+    }
+
+    function registerSoul(uint256 soulId) external onlyScribe {
+        if (soulId == 0) {
+            revert SoulNotFound(soulId);
+        }
+        if (registeredSouls[soulId]) {
+            revert SoulAlreadyRegistered(soulId);
+        }
+
+        registeredSouls[soulId] = true;
+        emit SoulRegistered(soulId);
     }
 
     function entryCount(uint256 soulId) external view returns (uint256) {

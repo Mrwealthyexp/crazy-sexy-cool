@@ -203,6 +203,20 @@ contract SoulForgeTest is Test {
         vm.stopPrank();
     }
 
+    function test_canAdvanceToMysteriousStage() public {
+        uint256 soulId = _forgeSoul(player);
+        _ascendToServant(soulId, player);
+
+        vm.startPrank(player);
+        engine.recordMilestone(soulId, TranscendenceEngine.JourneyMilestone.EnemyReconciliation, "reconcile");
+        engine.advanceStage(soulId);
+        vm.stopPrank();
+
+        TranscendenceEngine.SoulState memory soul = engine.stateOf(soulId);
+        assertEq(soul.stage, uint8(TranscendenceEngine.Stage.Mysterious));
+        assertTrue(!soul.isGreatTeacher);
+    }
+
     function _ascendToGreatTeacher(uint256 soulId, address soulOwner) internal {
         vm.startPrank(soulOwner);
         engine.initializeSoul(soulId);

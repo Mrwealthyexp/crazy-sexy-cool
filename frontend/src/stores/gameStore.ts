@@ -82,11 +82,21 @@ export const useGameStore = create<GameState>((set) => ({
           latestMessage: 'Only Enlightened souls can ask the world question.',
         }
       }
+      if (
+        state.playerSoul.lastWorldQuestionAt &&
+        Date.now() < state.playerSoul.lastWorldQuestionAt + 30 * 24 * 60 * 60 * 1000
+      ) {
+        return {
+          ...state,
+          latestMessage: 'The world question can only be asked once every 30 days.',
+        }
+      }
 
       return {
         playerSoul: {
           ...state.playerSoul,
           lastWorldQuestion: question,
+          lastWorldQuestionAt: Date.now(),
         },
         latestMessage: `The server now echoes: “${question}”`,
       }
