@@ -1,5 +1,5 @@
-import type { MoonPhase } from '../data/lunarPhases'
-import type { ZoneSnapshot } from '../data/zones'
+import type { MoonPhase } from '../data/lunarPhases.js'
+import type { ZoneSnapshot } from '../data/zones.js'
 
 export interface BattleResolutionInput {
   phase: MoonPhase

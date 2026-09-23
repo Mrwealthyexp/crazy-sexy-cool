@@ -1,4 +1,4 @@
-import type { MoonPhase } from '../data/lunarPhases'
+import type { MoonPhase } from '../data/lunarPhases.js'
 
 /**
  * EmotionOracle Service

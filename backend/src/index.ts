@@ -1,8 +1,8 @@
 import cors from 'cors'
 import dotenv from 'dotenv'
 import express from 'express'
-import { lunarPhases, type MoonPhase } from './data/lunarPhases'
-import { GameWorld } from './services/GameWorld'
+import { lunarPhases, type MoonPhase } from './data/lunarPhases.js'
+import { GameWorld } from './services/GameWorld.js'
 
 dotenv.config()
 

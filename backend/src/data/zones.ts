@@ -1,4 +1,4 @@
-import type { MoonPhase } from './lunarPhases'
+import type { MoonPhase } from './lunarPhases.js'
 
 export type ZoneAffinity = 'Crazy' | 'Sexy' | 'Cool' | 'Neutral'
 export type ZoneState = 'stable' | 'unlocked' | 'decaying' | 'veiled'

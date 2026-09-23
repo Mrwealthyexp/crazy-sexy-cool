@@ -1,7 +1,7 @@
-import { defaultMoonPhase, type MoonPhase } from '../data/lunarPhases'
-import { createZoneSnapshots, type ZoneSnapshot } from '../data/zones'
-import { EmotionOracle } from './EmotionOracle'
-import { ShadowArena, type BattleResolution } from './ShadowArena'
+import { defaultMoonPhase, type MoonPhase } from '../data/lunarPhases.js'
+import { createZoneSnapshots, type ZoneSnapshot } from '../data/zones.js'
+import { EmotionOracle } from './EmotionOracle.js'
+import { ShadowArena, type BattleResolution } from './ShadowArena.js'
 
 export interface QuestReward {
   karma: number
