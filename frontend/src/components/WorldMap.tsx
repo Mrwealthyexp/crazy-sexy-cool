@@ -1,4 +1,4 @@
-import { zones } from '../data/zones'
+import { useGameStore } from '../stores/gameStore'
 
 const zoneStyles = {
   safe: 'border-emerald-500/40 bg-emerald-500/10 text-emerald-300',
@@ -7,6 +7,8 @@ const zoneStyles = {
 }
 
 export default function WorldMap() {
+  const zones = useGameStore((state) => state.zones)
+
   return (
     <section className="rounded-lg bg-gray-800 p-4 shadow-lg">
       <div className="mb-4">

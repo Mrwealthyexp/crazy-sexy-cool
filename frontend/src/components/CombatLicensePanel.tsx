@@ -5,7 +5,8 @@ import {
 
 export default function CombatLicensePanel() {
   const combatProfile = useGameStore((state) => state.combatProfile)
-  const tierEvaluations = evaluateLicenseTiers(combatProfile)
+  const licenseTiers = useGameStore((state) => state.licenseTiers)
+  const tierEvaluations = evaluateLicenseTiers(combatProfile, licenseTiers)
 
   return (
     <section className="rounded-lg bg-gray-800 p-4 shadow-lg">

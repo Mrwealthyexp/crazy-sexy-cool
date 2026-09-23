@@ -1,4 +1,6 @@
 import { create } from 'zustand'
+import { fallbackZones, type Zone } from '../data/zones'
+import { fetchCombatOverview, setCombatMode } from '../utils/api'
 
 export interface GameState {
   playerLevel: number
@@ -37,7 +39,15 @@ export interface TierEvaluation extends LicenseTier {
 
 export interface GameStore extends GameState {
   combatProfile: PlayerCombatProfile
-  toggleCombatMode: () => void
+  licenseTiers: LicenseTier[]
+  consequenceRules: ConsequenceRule[]
+  zones: Zone[]
+  statusLabel: string
+  statusDescription: string
+  isLoading: boolean
+  error: string | null
+  hydrateCombatOverview: () => Promise<void>
+  toggleCombatMode: () => Promise<void>
 }
 
 export const initialGameState: GameState = {
@@ -80,22 +90,79 @@ const initialCombatProfile: PlayerCombatProfile = {
   activeBounty: 0,
 }
 
+const initialReadiness = getCombatReadiness(initialCombatProfile)
+
 export const useGameStore = create<GameStore>((set) => ({
   ...initialGameState,
   combatProfile: initialCombatProfile,
-  toggleCombatMode: () =>
-    set((state) => ({
-      combatProfile: {
-        ...state.combatProfile,
-        combatModeEquipped: !state.combatProfile.combatModeEquipped,
-      },
-    })),
+  licenseTiers,
+  consequenceRules,
+  zones: fallbackZones,
+  statusLabel: initialReadiness.statusLabel,
+  statusDescription: initialReadiness.statusDescription,
+  isLoading: false,
+  error: null,
+  hydrateCombatOverview: async () => {
+    set({ isLoading: true, error: null })
+
+    try {
+      const overview = await fetchCombatOverview()
+
+      set({
+        ...overview.gameState,
+        combatProfile: overview.combatProfile,
+        licenseTiers: overview.licenseTiers,
+        consequenceRules: overview.consequenceRules,
+        zones: overview.zones,
+        statusLabel: overview.readiness.statusLabel,
+        statusDescription: overview.readiness.statusDescription,
+        isLoading: false,
+      })
+    } catch (error) {
+      set({
+        isLoading: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Failed to load combat systems.',
+      })
+    }
+  },
+  toggleCombatMode: async () => {
+    set({ isLoading: true, error: null })
+
+    try {
+      const overview = await setCombatMode(
+        !useGameStore.getState().combatProfile.combatModeEquipped,
+      )
+
+      set({
+        ...overview.gameState,
+        combatProfile: overview.combatProfile,
+        licenseTiers: overview.licenseTiers,
+        consequenceRules: overview.consequenceRules,
+        zones: overview.zones,
+        statusLabel: overview.readiness.statusLabel,
+        statusDescription: overview.readiness.statusDescription,
+        isLoading: false,
+      })
+    } catch (error) {
+      set({
+        isLoading: false,
+        error:
+          error instanceof Error
+            ? error.message
+            : 'Failed to update combat mode.',
+      })
+    }
+  },
 }))
 
 export function evaluateLicenseTiers(
   profile: PlayerCombatProfile,
+  tiers: LicenseTier[],
 ): TierEvaluation[] {
-  return licenseTiers.map((tier) => {
+  return tiers.map((tier) => {
     const requirements = [
       {
         label: 'Combat tutorial completed',

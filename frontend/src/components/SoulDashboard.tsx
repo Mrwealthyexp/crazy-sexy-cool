@@ -1,16 +1,16 @@
-import {
-  consequenceRules,
-  getCombatReadiness,
-  useGameStore,
-} from '../stores/gameStore'
+import { useGameStore } from '../stores/gameStore'
 
 export default function SoulDashboard() {
   const playerLevel = useGameStore((state) => state.playerLevel)
   const karma = useGameStore((state) => state.karma)
   const souls = useGameStore((state) => state.souls)
   const combatProfile = useGameStore((state) => state.combatProfile)
+  const consequenceRules = useGameStore((state) => state.consequenceRules)
   const toggleCombatMode = useGameStore((state) => state.toggleCombatMode)
-  const readiness = getCombatReadiness(combatProfile)
+  const statusLabel = useGameStore((state) => state.statusLabel)
+  const statusDescription = useGameStore((state) => state.statusDescription)
+  const isLoading = useGameStore((state) => state.isLoading)
+  const error = useGameStore((state) => state.error)
 
   return (
     <section className="rounded-lg bg-gray-800 p-4 shadow-lg">
@@ -33,14 +33,23 @@ export default function SoulDashboard() {
               ? 'bg-rose-500 text-white hover:bg-rose-400'
               : 'bg-cyan-400 text-gray-950 hover:bg-cyan-300'
           }`}
-          onClick={toggleCombatMode}
+          disabled={isLoading}
+          onClick={() => void toggleCombatMode()}
           type="button"
         >
-          {combatProfile.combatModeEquipped
+          {isLoading
+            ? 'Updating...'
+            : combatProfile.combatModeEquipped
             ? 'Unequip combat badge'
             : 'Equip combat badge'}
         </button>
       </div>
+
+      {error ? (
+        <div className="mb-6 rounded-lg border border-rose-500/40 bg-rose-500/10 px-4 py-3 text-sm text-rose-200">
+          {error}
+        </div>
+      ) : null}
 
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         <StatCard label="Player level" value={`Lv. ${playerLevel}`} />
@@ -57,17 +66,17 @@ export default function SoulDashboard() {
                 Current posture
               </h3>
               <p className="mt-1 text-sm text-gray-400">
-                {readiness.statusDescription}
+                {statusDescription}
               </p>
             </div>
             <span
               className={`rounded-full px-3 py-1 text-xs font-semibold ${
-                readiness.combatReady
+                statusLabel === 'Combat enabled'
                   ? 'bg-emerald-500/15 text-emerald-300'
                   : 'bg-sky-500/15 text-sky-300'
               }`}
             >
-              {readiness.statusLabel}
+              {statusLabel}
             </span>
           </div>
 

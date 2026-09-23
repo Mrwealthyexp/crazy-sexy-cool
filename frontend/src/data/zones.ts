@@ -7,7 +7,7 @@ export interface Zone {
   combatRule: string
 }
 
-export const zones: Zone[] = [
+export const fallbackZones: Zone[] = [
   {
     id: 'aeterna-core',
     name: 'Aeterna Core',

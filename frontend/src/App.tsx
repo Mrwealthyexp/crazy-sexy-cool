@@ -1,9 +1,17 @@
 import './index.css'
+import { useEffect } from 'react'
 import CombatLicensePanel from './components/CombatLicensePanel'
 import SoulDashboard from './components/SoulDashboard'
 import WorldMap from './components/WorldMap'
+import { useGameStore } from './stores/gameStore'
 
 function App() {
+  const hydrateCombatOverview = useGameStore((state) => state.hydrateCombatOverview)
+
+  useEffect(() => {
+    void hydrateCombatOverview()
+  }, [hydrateCombatOverview])
+
   return (
     <div className="min-h-screen bg-gray-900 text-white">
       <header className="border-b border-gray-800 bg-gray-950/80 p-6">
