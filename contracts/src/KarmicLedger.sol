@@ -17,6 +17,7 @@ contract KarmicLedger {
 
     event ReputationUpdated(address indexed player, uint64 whiteKarma, uint64 grayKarma, uint64 blackKarma);
     event LicenseTierSet(address indexed player, uint8 tier);
+    event KarmaRecorded(uint256 indexed soulId, uint8 indexed karmaType, uint256 amount, string reason);
 
     modifier onlyAdmin() {
         require(msg.sender == admin, 'Only admin');
@@ -48,6 +49,10 @@ contract KarmicLedger {
     function setLicenseTier(address player, uint8 tier) external onlyAdmin {
         profiles[player].licenseTier = tier;
         emit LicenseTierSet(player, tier);
+    }
+
+    function recordKarma(uint256 soulId, uint8 karmaType, uint256 amount, string calldata reason) external {
+        emit KarmaRecorded(soulId, karmaType, amount, reason);
     }
 
     function getProfile(address player) external view returns (ReputationProfile memory) {

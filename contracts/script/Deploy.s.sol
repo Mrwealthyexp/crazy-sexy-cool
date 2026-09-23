@@ -6,6 +6,7 @@ import {KarmicLedger} from '../src/KarmicLedger.sol';
 import {SoulForge} from '../src/SoulForge.sol';
 import {TranscendenceEngine} from '../src/TranscendenceEngine.sol';
 import {WeatherOracle} from '../src/WeatherOracle.sol';
+import {CSCMarketplace} from '../src/CSCMarketplace.sol';
 
 contract Deploy {
     function run()
@@ -15,13 +16,15 @@ contract Deploy {
             KarmicLedger karmicLedger,
             SoulForge soulForge,
             TranscendenceEngine transcendenceEngine,
-            WeatherOracle weatherOracle
+            WeatherOracle weatherOracle,
+            CSCMarketplace marketplace
         )
     {
         coolToken = new CoolToken();
         karmicLedger = new KarmicLedger();
-        soulForge = new SoulForge();
-        transcendenceEngine = new TranscendenceEngine(address(karmicLedger));
+        soulForge = new SoulForge(address(0), address(0));
+        transcendenceEngine = new TranscendenceEngine(address(soulForge), address(karmicLedger), address(coolToken));
         weatherOracle = new WeatherOracle();
+        marketplace = new CSCMarketplace(address(coolToken), msg.sender, msg.sender);
     }
 }

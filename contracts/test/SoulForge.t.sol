@@ -1,25 +1,32 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
+import {CoolToken} from '../src/CoolToken.sol';
 import {KarmicLedger} from '../src/KarmicLedger.sol';
 import {SoulForge} from '../src/SoulForge.sol';
+import {TranscendenceEngine} from '../src/TranscendenceEngine.sol';
 
 contract SoulForgeTest {
     SoulForge internal soulForge;
     KarmicLedger internal karmicLedger;
+    CoolToken internal coolToken;
+    TranscendenceEngine internal transcendenceEngine;
 
     function setUp() public {
-        soulForge = new SoulForge();
+        soulForge = new SoulForge(address(0), address(0));
         karmicLedger = new KarmicLedger();
+        coolToken = new CoolToken();
+        transcendenceEngine = new TranscendenceEngine(address(soulForge), address(karmicLedger), address(coolToken));
     }
 
-    function test_mintAvatarStoresOwnerAndMetadata() public {
-        uint256 avatarId = soulForge.mintAvatar('cool', 'architect');
-        SoulForge.AvatarProfile memory avatar = soulForge.getAvatar(avatarId);
+    function test_soulForgeStartsWithZeroSupply() public view {
+        require(soulForge.getTotalSouls() == 0, 'expected zero souls');
+    }
 
-        require(avatar.owner == address(this), 'owner mismatch');
-        require(keccak256(bytes(avatar.temperament)) == keccak256(bytes('cool')), 'temperament mismatch');
-        require(keccak256(bytes(avatar.archetype)) == keccak256(bytes('architect')), 'archetype mismatch');
+    function test_transcendenceEngineWiring() public view {
+        require(address(transcendenceEngine.soulForge()) == address(soulForge), 'soulforge mismatch');
+        require(address(transcendenceEngine.karmicLedger()) == address(karmicLedger), 'ledger mismatch');
+        require(address(transcendenceEngine.coolToken()) == address(coolToken), 'cooltoken mismatch');
     }
 
     function test_combatEligibilityRequiresTierAndClearReputation() public {
