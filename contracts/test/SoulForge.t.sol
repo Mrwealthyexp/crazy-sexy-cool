@@ -13,6 +13,23 @@ contract SoulTransferHelper {
     }
 }
 
+contract EngineCallHelper {
+    function callRecordKarma(TranscendenceEngine engine, uint256 soulId, uint8 karmaType, uint256 amount)
+        external
+        returns (bool)
+    {
+        (bool success, ) = address(engine).call(
+            abi.encodeWithSignature('recordKarma(uint256,uint8,uint256)', soulId, karmaType, amount)
+        );
+        return success;
+    }
+
+    function callBurnSoulTokens(TranscendenceEngine engine, uint256 soulId, uint256 amount) external returns (bool) {
+        (bool success, ) = address(engine).call(abi.encodeWithSignature('burnSoulTokens(uint256,uint256)', soulId, amount));
+        return success;
+    }
+}
+
 contract SoulForgeTest {
     SoulForge internal soulForge;
     KarmicLedger internal karmicLedger;
@@ -24,6 +41,7 @@ contract SoulForgeTest {
         karmicLedger = new KarmicLedger();
         coolToken = new CoolToken();
         transcendenceEngine = new TranscendenceEngine(address(soulForge), address(karmicLedger), address(coolToken));
+        karmicLedger.setKarmaRecorder(address(transcendenceEngine));
     }
 
     function attemptTransferTo(address recipient, uint256 soulId) external {
@@ -120,6 +138,17 @@ contract SoulForgeTest {
         require(overEvolved, 'expected overEvolved');
     }
 
+    function test_levelUpJobAtThresholdDoesNotOverEvolve() public {
+        uint256 soulId = soulForge.forgeSoul{value: soulForge.MINT_COST()}(1, 11, 2, 0);
+
+        transcendenceEngine.initializeSoulState(soulId);
+        transcendenceEngine.addMitochondrialPoints(soulId, 10000);
+        transcendenceEngine.levelUpJob(soulId, 0);
+
+        (, , , , , , bool overEvolved, , , ) = transcendenceEngine.getSoulState(soulId);
+        require(!overEvolved, 'should not over evolve at threshold');
+    }
+
     function test_karmicAndSoulTokenMutatorsUpdateState() public {
         uint256 soulId = soulForge.forgeSoul{value: soulForge.MINT_COST()}(0, 9, 2, 2);
         transcendenceEngine.initializeSoulState(soulId);
@@ -152,6 +181,56 @@ contract SoulForgeTest {
 
         require(whiteKarma == 5, 'white karma mismatch');
         require(soulTokens == (100 * 10 ** 18) + 25, 'soul token mismatch');
+    }
+
+    function test_burnSoulTokensRequiresInitialization() public {
+        uint256 soulId = soulForge.forgeSoul{value: soulForge.MINT_COST()}(1, 2, 3, 1);
+        (bool success, ) =
+            address(transcendenceEngine).call(abi.encodeWithSignature('burnSoulTokens(uint256,uint256)', soulId, 1));
+        require(!success, 'expected burn guard revert');
+    }
+
+    function test_recordKarmaRequiresOwner() public {
+        uint256 soulId = soulForge.forgeSoul{value: soulForge.MINT_COST()}(2, 4, 1, 1);
+        transcendenceEngine.initializeSoulState(soulId);
+        EngineCallHelper helper = new EngineCallHelper();
+        bool success = helper.callRecordKarma(transcendenceEngine, soulId, 0, 1);
+        require(!success, 'expected onlyOwner revert');
+    }
+
+    function test_recordKarmaRequiresInitialization() public {
+        uint256 soulId = soulForge.forgeSoul{value: soulForge.MINT_COST()}(2, 1, 0, 1);
+        (bool success, ) =
+            address(transcendenceEngine).call(abi.encodeWithSignature('recordKarma(uint256,uint8,uint256)', soulId, 0, 1));
+        require(!success, 'expected initialization guard revert');
+    }
+
+    function test_recordKarmaRequiresConfiguredRecorder() public {
+        uint256 soulId = soulForge.forgeSoul{value: soulForge.MINT_COST()}(1, 4, 2, 1);
+        transcendenceEngine.initializeSoulState(soulId);
+        karmicLedger.setKarmaRecorder(address(0xDEAD));
+
+        (bool success, ) =
+            address(transcendenceEngine).call(abi.encodeWithSignature('recordKarma(uint256,uint8,uint256)', soulId, 0, 1));
+        require(!success, 'expected recorder configuration guard revert');
+    }
+
+    function test_ownerCanBurnSoulTokensAfterInitialization() public {
+        uint256 soulId = soulForge.forgeSoul{value: soulForge.MINT_COST()}(2, 6, 2, 2);
+        transcendenceEngine.initializeSoulState(soulId);
+        transcendenceEngine.burnSoulTokens(soulId, 50);
+
+        (, , , , uint256 soulTokens, , , , , ) = transcendenceEngine.getSoulState(soulId);
+        require(soulTokens == (100 * 10 ** 18) - 50, 'owner burn did not reduce balance');
+    }
+
+    function test_unauthorizedCannotBurnSoulTokensAfterInitialization() public {
+        uint256 soulId = soulForge.forgeSoul{value: soulForge.MINT_COST()}(2, 10, 3, 0);
+        transcendenceEngine.initializeSoulState(soulId);
+
+        EngineCallHelper helper = new EngineCallHelper();
+        bool success = helper.callBurnSoulTokens(transcendenceEngine, soulId, 1);
+        require(!success, 'expected unauthorized burn revert');
     }
 
     function test_transcendenceEngineWiring() public view {

@@ -4,10 +4,14 @@ pragma solidity ^0.8.20;
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/token/ERC721/IERC721.sol';
 import '@openzeppelin/contracts/token/ERC721/IERC721Receiver.sol';
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol';
 import '@openzeppelin/contracts/utils/ReentrancyGuard.sol';
 import './CoolToken.sol';
 
 contract CSCMarketplace is Ownable, IERC721Receiver, ReentrancyGuard {
+    using SafeERC20 for IERC20;
+
     struct Listing {
         address seller;
         address tokenContract;
@@ -17,6 +21,7 @@ contract CSCMarketplace is Ownable, IERC721Receiver, ReentrancyGuard {
     }
 
     mapping(uint256 => Listing) public listings;
+    mapping(address => mapping(uint256 => uint256)) public activeListingByToken;
     uint256 private _listingIdCounter;
 
     uint256 public constant PLATFORM_FEE = 250;
@@ -43,6 +48,7 @@ contract CSCMarketplace is Ownable, IERC721Receiver, ReentrancyGuard {
     function listItem(address tokenContract, uint256 tokenId, uint256 price) external nonReentrant {
         require(tokenContract != address(0), 'Invalid token contract');
         require(price > 0, 'Price must be > 0');
+        require(activeListingByToken[tokenContract][tokenId] == 0, 'Token already listed');
 
         IERC721(tokenContract).safeTransferFrom(msg.sender, address(this), tokenId);
 
@@ -54,6 +60,7 @@ contract CSCMarketplace is Ownable, IERC721Receiver, ReentrancyGuard {
             price: price,
             active: true
         });
+        activeListingByToken[tokenContract][tokenId] = listingId;
 
         emit ItemListed(listingId, msg.sender, price);
     }
@@ -70,15 +77,17 @@ contract CSCMarketplace is Ownable, IERC721Receiver, ReentrancyGuard {
         uint256 charityAmount = (price * CHARITY_SHARE) / FEE_DENOMINATOR;
         uint256 remainder = price - sellerBaseAmount - platformFeeAmount - burnAmount - charityAmount;
         uint256 sellerAmount = sellerBaseAmount + remainder;
-        uint256 escrowAmount = price - burnAmount;
-
         listing.active = false;
+        activeListingByToken[listing.tokenContract][listing.tokenId] = 0;
 
-        require(coolToken.transferFrom(msg.sender, address(this), escrowAmount), 'Payment transfer failed');
-        require(coolToken.burnFrom(msg.sender, burnAmount), 'Burn failed');
-        require(coolToken.transfer(listing.seller, sellerAmount), 'Seller transfer failed');
-        require(coolToken.transfer(treasury, platformFeeAmount), 'Treasury transfer failed');
-        require(coolToken.transfer(charityPool, charityAmount), 'Charity transfer failed');
+        uint256 balanceBefore = coolToken.balanceOf(address(this));
+        IERC20 token = IERC20(address(coolToken));
+        token.safeTransferFrom(msg.sender, address(this), price);
+        token.safeTransfer(listing.seller, sellerAmount);
+        token.safeTransfer(treasury, platformFeeAmount);
+        token.safeTransfer(charityPool, charityAmount);
+        require(coolToken.burn(burnAmount), 'Burn failed');
+        require(coolToken.balanceOf(address(this)) == balanceBefore, 'Settlement imbalance');
 
         IERC721(listing.tokenContract).safeTransferFrom(address(this), msg.sender, listing.tokenId);
 
@@ -91,6 +100,7 @@ contract CSCMarketplace is Ownable, IERC721Receiver, ReentrancyGuard {
         require(listing.seller == msg.sender || msg.sender == owner(), 'Not authorized');
 
         listing.active = false;
+        activeListingByToken[listing.tokenContract][listing.tokenId] = 0;
         IERC721(listing.tokenContract).safeTransferFrom(address(this), listing.seller, listing.tokenId);
 
         emit ListingCancelled(listingId);

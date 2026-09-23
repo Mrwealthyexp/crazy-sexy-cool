@@ -31,6 +31,7 @@ contract SoulForge is ERC721, ERC721Enumerable, Ownable, ReentrancyGuard {
 
     event SoulForged(uint256 indexed soulId, address indexed owner, uint8 rulingPlanet);
     event TokenBoundAccountCreated(uint256 indexed soulId, address indexed account);
+    event TokenBoundAccountCreationFailed(uint256 indexed soulId, bytes reason);
 
     constructor(address _registry, address _accountImplementation)
         ERC721('CrazySexyCool Soul', 'CSCSOUL')
@@ -59,7 +60,7 @@ contract SoulForge is ERC721, ERC721Enumerable, Ownable, ReentrancyGuard {
 
         uint8 rulingPlanet = uint8(entropy % 10);
         bytes32 mitoSeed = keccak256(abi.encodePacked(entropy, block.number));
-        uint256 karmicDebt = calculateKarmicDebt(msg.sender);
+        uint256 karmicDebt = calculateKarmicDebt(msg.sender, entropy);
 
         soulId = ++_tokenIdCounter;
 
@@ -85,25 +86,22 @@ contract SoulForge is ERC721, ERC721Enumerable, Ownable, ReentrancyGuard {
 
     function createTokenBoundAccount(uint256 soulId) internal {
         bytes32 salt = keccak256(abi.encodePacked(soulId));
-        address tba = registry.createAccount(
-            accountImplementation,
-            salt,
-            block.chainid,
-            address(this),
-            soulId,
-            ''
-        );
-
-        tokenBoundAccounts[soulId] = tba;
-        emit TokenBoundAccountCreated(soulId, tba);
+        try registry.createAccount(accountImplementation, salt, block.chainid, address(this), soulId, '') returns (
+            address tba
+        ) {
+            tokenBoundAccounts[soulId] = tba;
+            emit TokenBoundAccountCreated(soulId, tba);
+        } catch (bytes memory reason) {
+            emit TokenBoundAccountCreationFailed(soulId, reason);
+        }
     }
 
     function getTokenBoundAccount(uint256 soulId) external view returns (address) {
         return tokenBoundAccounts[soulId];
     }
 
-    function calculateKarmicDebt(address wallet) internal pure returns (uint256) {
-        return uint256(keccak256(abi.encodePacked(wallet))) % 10000;
+    function calculateKarmicDebt(address wallet, uint256 entropy) internal pure returns (uint256) {
+        return uint256(keccak256(abi.encodePacked(wallet, entropy))) % 10000;
     }
 
     function getSoulBlueprint(uint256 soulId) external view returns (SoulBlueprint memory) {
@@ -113,6 +111,15 @@ contract SoulForge is ERC721, ERC721Enumerable, Ownable, ReentrancyGuard {
 
     function getSoulByWallet(address wallet) external view returns (uint256) {
         return walletToSoul[wallet];
+    }
+
+    function hasSoul(address wallet) external view returns (bool) {
+        uint256 soulId = walletToSoul[wallet];
+        return soulId != 0 && _ownerOf(soulId) == wallet;
+    }
+
+    function soulExists(uint256 soulId) external view returns (bool) {
+        return _ownerOf(soulId) != address(0);
     }
 
     function getTotalSouls() external view returns (uint256) {

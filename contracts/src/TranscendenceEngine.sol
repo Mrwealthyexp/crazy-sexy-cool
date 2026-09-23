@@ -60,11 +60,15 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
     uint256 public constant FAIR_EMOTIONS_COST = 10000 * 10 ** 18;
     uint256 public constant INTERVENTION_COOLDOWN = 7 days;
     uint256 public constant ASCENSION_LOCK = 1 days;
+    uint256 public constant CRAZY_TRACK_JOB_ID = 0;
+    uint256 public constant SEXY_TRACK_JOB_ID = 10;
+    uint256 public constant COOL_TRACK_JOB_ID = 20;
 
     uint256 public currentWorldQuestionBlock;
+    uint256 public currentWorldQuestionId;
     string public currentWorldQuestion;
-    mapping(address => string) public worldAnswers;
-    mapping(address => uint256) public lastAnsweredQuestionBlock;
+    mapping(uint256 => mapping(address => string)) private _worldAnswersByQuestionId;
+    mapping(address => uint256) public lastAnsweredQuestionId;
     address[] public worldAnswerers;
 
     event StageAdvanced(uint256 indexed soulId, WorldlyState newStage);
@@ -77,12 +81,13 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
     event WorldQuestionAsked(string question, uint256 blockNumber);
 
     modifier onlySoulOwner(uint256 soulId) {
+        require(soulForge.soulExists(soulId), 'Soul does not exist');
         require(soulForge.ownerOf(soulId) == msg.sender, 'Not soul owner');
         _;
     }
 
     modifier onlyInitializedSoul(uint256 soulId) {
-        require(soulForge.ownerOf(soulId) != address(0), 'Soul does not exist');
+        require(soulForge.soulExists(soulId), 'Soul does not exist');
         require(soulStates[soulId].initialized, 'Soul not initialized');
         _;
     }
@@ -120,6 +125,7 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
 
     function recordKarma(uint256 soulId, uint8 karmaType, uint256 amount) external onlyOwner onlyInitializedSoul(soulId) {
         require(karmaType <= 2, 'Invalid karma type');
+        require(karmicLedger.karmaRecorder() == address(this), 'Ledger recorder not configured');
         SoulState storage soul = soulStates[soulId];
         if (karmaType == 0) soul.whiteKarma += amount;
         else if (karmaType == 1) soul.blackKarma += amount;
@@ -156,13 +162,15 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
         SoulState storage soul = soulStates[soulId];
 
         if (currentStage == WorldlyState.Crazy) {
-            return soul.jobLevels[0] >= 3;
+            return soul.jobLevels[CRAZY_TRACK_JOB_ID] >= 3;
         } else if (currentStage == WorldlyState.Sexy) {
-            return soul.jobLevels[10] >= 3;
+            return soul.jobLevels[SEXY_TRACK_JOB_ID] >= 3;
         } else if (currentStage == WorldlyState.Cool) {
-            return soul.jobLevels[20] >= 3;
+            return soul.jobLevels[COOL_TRACK_JOB_ID] >= 3;
         } else if (currentStage == WorldlyState.Integrated) {
-            return soul.jobLevels[0] >= 5 && soul.jobLevels[10] >= 5 && soul.jobLevels[20] >= 5;
+            return soul.jobLevels[CRAZY_TRACK_JOB_ID] >= 5
+                && soul.jobLevels[SEXY_TRACK_JOB_ID] >= 5
+                && soul.jobLevels[COOL_TRACK_JOB_ID] >= 5;
         } else if (currentStage == WorldlyState.Servant) {
             return soul.interventionsPerformed >= 10;
         } else if (currentStage == WorldlyState.Mysterious) {
@@ -172,8 +180,11 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
     }
 
     function divineIntervention(uint256 targetSoul, GodSkill skill, uint256 zoneId, bytes32 zkProof) external nonReentrant {
+        require(uint256(skill) <= uint256(GodSkill.FairEmotions), 'Invalid skill');
+        require(soulForge.hasSoul(msg.sender), 'No soul found');
         uint256 teacherSoul = soulForge.getSoulByWallet(msg.sender);
-        require(teacherSoul != 0, 'No soul found');
+        require(soulForge.soulExists(targetSoul), 'Target soul does not exist');
+        require(soulStates[targetSoul].initialized, 'Target soul not initialized');
 
         SoulState storage teacher = soulStates[teacherSoul];
         require(teacher.initialized, 'Soul not initialized');
@@ -245,30 +256,32 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
     }
 
     function askWorldQuestion(string calldata question) external {
+        require(soulForge.hasSoul(msg.sender), 'No soul');
         uint256 soulId = soulForge.getSoulByWallet(msg.sender);
-        require(soulId != 0, 'No soul');
+        require(soulStates[soulId].initialized, 'Soul not initialized');
         require(soulStates[soulId].stage == WorldlyState.Enlightened, 'Not Enlightened');
-        require(block.number >= currentWorldQuestionBlock + 216000, 'Too soon');
+        require(bytes(question).length > 0, 'Empty question');
+        require(currentWorldQuestionBlock == 0 || block.number >= currentWorldQuestionBlock + 216000, 'Too soon');
 
         currentWorldQuestion = question;
         currentWorldQuestionBlock = block.number;
+        currentWorldQuestionId++;
         delete worldAnswerers;
 
         emit WorldQuestionAsked(question, block.number);
     }
 
     function answerWorldQuestion(string calldata answer) external {
-        uint256 soulId = soulForge.getSoulByWallet(msg.sender);
-        require(soulId != 0, 'No soul');
+        require(soulForge.hasSoul(msg.sender), 'No soul');
         require(currentWorldQuestionBlock != 0, 'No active question');
         require(bytes(answer).length > 0, 'Empty answer');
 
-        if (lastAnsweredQuestionBlock[msg.sender] != currentWorldQuestionBlock) {
+        if (lastAnsweredQuestionId[msg.sender] != currentWorldQuestionId) {
             worldAnswerers.push(msg.sender);
-            lastAnsweredQuestionBlock[msg.sender] = currentWorldQuestionBlock;
+            lastAnsweredQuestionId[msg.sender] = currentWorldQuestionId;
         }
 
-        worldAnswers[msg.sender] = answer;
+        _worldAnswersByQuestionId[currentWorldQuestionId][msg.sender] = answer;
     }
 
     function levelUpJob(uint256 soulId, uint256 jobId) external onlySoulOwner(soulId) onlyInitializedSoul(soulId) {
@@ -289,11 +302,22 @@ contract TranscendenceEngine is Ownable, ReentrancyGuard {
         soulStates[soulId].soulTokens += amount;
     }
 
-    function burnSoulTokens(uint256 soulId, uint256 amount) external {
-        require(soulForge.ownerOf(soulId) == msg.sender || msg.sender == address(this), 'Unauthorized');
+    function burnSoulTokens(uint256 soulId, uint256 amount) external onlyInitializedSoul(soulId) {
+        require(soulForge.ownerOf(soulId) == msg.sender || msg.sender == address(this) || msg.sender == owner(), 'Unauthorized');
         SoulState storage soul = soulStates[soulId];
         require(soul.soulTokens >= amount, 'Insufficient SOUL');
         soul.soulTokens -= amount;
+    }
+
+    function worldAnswers(address account) external view returns (string memory) {
+        if (currentWorldQuestionId == 0) return '';
+        if (lastAnsweredQuestionId[account] != currentWorldQuestionId) return '';
+        return _worldAnswersByQuestionId[currentWorldQuestionId][account];
+    }
+
+    function getWorldAnswerByQuestion(uint256 questionId, address account) external view returns (string memory) {
+        if (questionId == 0) return '';
+        return _worldAnswersByQuestionId[questionId][account];
     }
 
     function getSoulState(uint256 soulId)
