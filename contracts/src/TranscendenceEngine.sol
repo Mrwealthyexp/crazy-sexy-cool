@@ -239,6 +239,31 @@ contract TranscendenceEngine is OwnableLite {
         uint8 skillType,
         bytes32 zkProof
     ) external onlySoulKeeper(soulId) soulMustExist(soulId) returns (bool) {
+        _performDivineIntervention(soulId, skillType, zkProof);
+        return true;
+    }
+
+    function invokeWeatherShift(
+        uint256 soulId,
+        string calldata zoneId,
+        WeatherOracle.Weather weather,
+        WeatherOracle.MoonPhase moonPhase,
+        string calldata narrative,
+        bytes32 zkProof,
+        bool servesCollectiveGrowth
+    ) external onlySoulKeeper(soulId) soulMustExist(soulId) returns (bool) {
+        _performDivineIntervention(soulId, uint8(DivineSkill.Weather), zkProof);
+        weatherOracle.setZoneWeather(zoneId, weather, moonPhase, narrative);
+
+        if (!servesCollectiveGrowth) {
+            divinePowerSuspensionEndsAt[soulId] = block.timestamp + 7 days;
+            _recordKarma(soulId, KarmicLedger.KarmaType.Gray, 1_000, -1_000, "Weather used for ego.");
+        }
+
+        return true;
+    }
+
+    function _performDivineIntervention(uint256 soulId, uint8 skillType, bytes32 zkProof) internal {
         if (!_souls[soulId].isGreatTeacher) {
             revert OnlyGreatTeacher(soulId);
         }
@@ -265,27 +290,6 @@ contract TranscendenceEngine is OwnableLite {
         }
 
         emit DivineInterventionInvoked(soulId, DivineSkill(skillType), zkProof);
-        return true;
-    }
-
-    function invokeWeatherShift(
-        uint256 soulId,
-        string calldata zoneId,
-        WeatherOracle.Weather weather,
-        WeatherOracle.MoonPhase moonPhase,
-        string calldata narrative,
-        bytes32 zkProof,
-        bool servesCollectiveGrowth
-    ) external onlySoulKeeper(soulId) soulMustExist(soulId) returns (bool) {
-        divineIntervention(soulId, uint8(DivineSkill.Weather), zkProof);
-        weatherOracle.setZoneWeather(zoneId, weather, moonPhase, narrative);
-
-        if (!servesCollectiveGrowth) {
-            divinePowerSuspensionEndsAt[soulId] = block.timestamp + 7 days;
-            _recordKarma(soulId, KarmicLedger.KarmaType.Gray, 1_000, -1_000, "Weather used for ego.");
-        }
-
-        return true;
     }
 
     function karmicAudit(uint256 soulId) public view soulMustExist(soulId) returns (bool canAscend) {

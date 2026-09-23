@@ -1,4 +1,5 @@
-import { configureChains, createConfig } from 'wagmi'
-import { publicProvider } from 'wagmi/providers/public'
-
-// Wagmi configuration here
+export const walletConnectionConfig = {
+  chain: 'base-sepolia',
+  transport: 'walletconnect',
+  accountModel: 'erc-6551',
+}
