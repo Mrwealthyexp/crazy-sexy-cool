@@ -50,7 +50,9 @@ export default function WorldMap() {
                       {formatState(zone.state)}
                     </span>
                   </div>
-                  <p className="mt-2 text-sm text-gray-400">{zone.region} · {zone.coordinates.join(', ')}</p>
+                  <p className="mt-2 text-sm text-gray-400">
+                    {hiddenByDarkMoon ? 'Coordinates obscured by the veil' : `${zone.region} · ${zone.coordinates.join(', ')}`}
+                  </p>
                   <p className="mt-2 text-gray-300">
                     {hiddenByDarkMoon ? 'The zone is veiled. Only Great Teachers can read its truth.' : zone.description}
                   </p>

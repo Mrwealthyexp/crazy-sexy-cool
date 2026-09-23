@@ -8,29 +8,18 @@ import { lunarPhases } from './data/lunarPhases'
 import { getPhaseTheme, useGameStore } from './stores/gameStore'
 
 function App() {
-  const {
-    currentMoonPhase,
-    connection,
-    loading,
-    error,
-    initializeGame,
-    setMoonPhase,
-    clearError,
-  } = useGameStore((state) => ({
-    currentMoonPhase: state.currentMoonPhase,
-    connection: state.connection,
-    loading: state.loading,
-    error: state.error,
-    initializeGame: state.initializeGame,
-    setMoonPhase: state.setMoonPhase,
-    clearError: state.clearError,
-  }))
+  const currentMoonPhase = useGameStore((state) => state.currentMoonPhase)
+  const connection = useGameStore((state) => state.connection)
+  const loading = useGameStore((state) => state.loading)
+  const error = useGameStore((state) => state.error)
+  const setMoonPhase = useGameStore((state) => state.setMoonPhase)
+  const clearError = useGameStore((state) => state.clearError)
 
   const activePhase = getPhaseTheme(currentMoonPhase)
 
   useEffect(() => {
-    void initializeGame()
-  }, [initializeGame])
+    void useGameStore.getState().initializeGame()
+  }, [])
 
   return (
     <div className="min-h-screen bg-gray-900 text-white">
