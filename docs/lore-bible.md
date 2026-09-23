@@ -1,19 +1,21 @@
 # Lore Bible - Crazy Sexy Cool
 
 ## World Setting
+In 2075, the drowned old world gives way to **Aeterna**, a crystalline megacity revealed after Antarctica thaws. Every citizen enters through a wallet-linked soul, and every meaningful act leaves a permanent karmic imprint on the city.
 
-### The Realms
-The game world consists of multiple interconnected realms, each with its own unique characteristics, inhabitants, and challenges.
+## Sacred Districts
 
-## Characters
+### Soul Forge
+The Soul Forge is a cathedral of identity where cosmic alignment becomes an owned avatar. A forged soul is more than a profile; it is a wallet-bound self with rights, memory, and consequence.
 
-### The Players
-Players take on the role of souls seeking transcendence through various challenges and experiences.
+### Aeterna Gate
+Aeterna Gate is the city's creative exchange, where artifacts, services, and reputation circulate openly. It is the district where inspiration becomes visible value.
 
-## History
+### Shadow Arena
+Shadow Arena is the only place where force is lawful. The statues surrounding it judge intent, so combat without licensure stains the soul faster than any victory can cleanse it.
 
-### Ancient Times
-The world was forged through cosmic forces and spiritual energies.
+### Oracle District
+Oracle District is where disciplined minds ask questions large enough to bend the climate and mood of the city. Only transcended souls can keep the district's answers alive for a full day.
 
-### Modern Era
-Players navigate the realms seeking enlightenment and progression.
+## Player Fantasy
+Players are not anonymous accounts moving through menus. They are sovereign souls learning when to create, when to fight, when to earn, and when to become worthy of changing the world itself.
