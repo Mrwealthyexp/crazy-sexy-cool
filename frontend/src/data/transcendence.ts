@@ -412,7 +412,7 @@ function passesKarmicAudit(profile: SoulProfile) {
 
 export function generateSoulProfile(input: SoulBlueprintInput): SoulProfile {
   const seed = hashSeed(
-    `${input.walletAddress}|${input.signatureTimestamp}|${input.birthMonth}|${input.sex}|${input.rulingPlanet}|${input.moonPhase}|${input.temperament}|${input.name}`,
+    `${input.walletAddress}|${input.signatureTimestamp}|${input.birthMonth}|${input.sex}|${input.rulingPlanet}|${input.moonPhase}|${input.temperament}`,
   )
   const influence = planetaryInfluence[input.rulingPlanet]
   const elementalAffinity = birthMonthToElement[input.birthMonth] ?? 'Fire'
@@ -463,7 +463,7 @@ export function getMoonDefinition(phase: MoonPhase) {
 
 export function performAction(profile: SoulProfile, actionId: SoulMilestone): SoulProfile {
   const action = actionCatalog.find((entry) => entry.id === actionId)
-  if (!action || hasMilestone(profile, actionId)) {
+  if (!action || action.stage !== profile.currentStage || hasMilestone(profile, actionId)) {
     return profile
   }
 

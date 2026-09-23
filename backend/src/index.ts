@@ -24,11 +24,26 @@ app.get('/game/data', (_req, res) => {
 })
 
 app.post('/game/action', (req, res) => {
-  const action = req.body ?? {}
+  const action = req.body
+
+  if (
+    !action ||
+    typeof action !== 'object' ||
+    typeof action.type !== 'string' ||
+    (action.payload !== undefined && (typeof action.payload !== 'object' || Array.isArray(action.payload)))
+  ) {
+    return res.status(400).json({
+      accepted: false,
+      error: 'Invalid action payload. Expected { type: string, payload?: object }.',
+    })
+  }
 
   res.json({
     accepted: true,
-    action,
+    action: {
+      type: action.type,
+      payload: action.payload ?? {},
+    },
     outcome: 'Action recorded in prototype mode. Wire this endpoint to on-chain or attestation logic next.',
   })
 })
