@@ -13,11 +13,11 @@ app.use(cors())
 app.use(express.json())
 
 // Routes
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({ status: 'ok' })
 })
 
-app.get('/combat/overview', (req, res) => {
+app.get('/combat/overview', (_req, res) => {
   res.json(shadowArena.getCombatOverview())
 })
 

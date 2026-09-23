@@ -3,12 +3,12 @@
  * Handles emotion detection and processing
  */
 export class EmotionOracle {
-  async detectEmotion(data: any) {
+  async detectEmotion(_data: any) {
     // Emotion detection logic
     return {}
   }
 
-  async processEmotionalData(emotionData: any) {
+  async processEmotionalData(_emotionData: any) {
     // Process emotional data
     return {}
   }
