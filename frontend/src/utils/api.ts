@@ -39,11 +39,22 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, init)
 
   if (!response.ok) {
-    const errorMessage = await response.text()
+    const errorMessage = await readErrorMessage(response)
     throw new Error(errorMessage || `Request failed with status ${response.status}`)
   }
 
   return response.json() as Promise<T>
+}
+
+async function readErrorMessage(response: Response) {
+  const contentType = response.headers.get('content-type') || ''
+
+  if (contentType.includes('application/json')) {
+    const payload = (await response.json()) as { error?: string }
+    return payload.error || 'Request failed'
+  }
+
+  return response.text()
 }
 
 export function fetchCombatOverview() {
