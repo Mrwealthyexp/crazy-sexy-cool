@@ -178,28 +178,41 @@ export function evaluateLicenseTiers(
   tiers: LicenseTier[],
 ): TierEvaluation[] {
   return tiers.map((tier) => {
-    const requirements = [
-      {
-        label: 'Combat tutorial completed',
-        met: profile.tutorialComplete,
-      },
-      {
-        label: '5 ranked wins secured',
-        met: profile.rankedWins >= 5,
-      },
-      {
-        label: 'No bans or fraud SBTs on-chain',
-        met: !profile.hasBan && !profile.hasFraudSbt,
-      },
-      {
-        label: `${tier.coolBurn} $COOL available to burn`,
-        met: profile.coolBalance >= tier.coolBurn,
-      },
-      {
-        label: `${tier.waitDays}-day cooldown satisfied`,
-        met: tier.waitDays === 0 || profile.daysSinceLastTier >= tier.waitDays,
-      },
-    ]
+    const requirements =
+      tier.tier === 1
+        ? [
+            {
+              label: 'Combat tutorial completed',
+              met: profile.tutorialComplete,
+            },
+            {
+              label: '5 ranked wins secured',
+              met: profile.rankedWins >= 5,
+            },
+            {
+              label: 'No bans or fraud SBTs on-chain',
+              met: !profile.hasBan && !profile.hasFraudSbt,
+            },
+          ]
+        : [
+            {
+              label: `Tier ${tier.tier - 1} already unlocked`,
+              met: profile.currentTier >= tier.tier - 1,
+            },
+            {
+              label: `${tier.coolBurn} $COOL available to burn`,
+              met: profile.coolBalance >= tier.coolBurn,
+            },
+            {
+              label: `${tier.waitDays}-day cooldown satisfied`,
+              met:
+                tier.waitDays === 0 || profile.daysSinceLastTier >= tier.waitDays,
+            },
+            {
+              label: 'No bans or fraud SBTs on-chain',
+              met: !profile.hasBan && !profile.hasFraudSbt,
+            },
+          ]
 
     return {
       ...tier,

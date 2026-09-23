@@ -55,7 +55,9 @@ async function requestJson<T>(path: string, init?: RequestInit): Promise<T> {
   const response = await fetch(`${API_URL}${path}`, init)
 
   if (!response.ok) {
-    throw new Error(`Request failed for ${path}`)
+    throw new Error(
+      `Request failed for ${path}: ${response.status} ${response.statusText}`,
+    )
   }
 
   return response.json() as Promise<T>
