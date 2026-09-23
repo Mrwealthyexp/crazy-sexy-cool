@@ -6,7 +6,7 @@ export type ZoneAccess = 'open' | 'trial' | 'teacher-only'
 export type ZoneVisibility = 'clear' | 'obscured' | 'teacher-sight'
 export type ZoneRewardFocus = 'karma' | 'souls' | 'wisdom'
 
-export interface Zone {
+export interface ZoneDefinition {
   id: string
   name: string
   region: string
@@ -18,13 +18,13 @@ export interface Zone {
   rewardFocus: ZoneRewardFocus
 }
 
-export interface ZoneSnapshot extends Zone {
+export interface ZoneSnapshot extends ZoneDefinition {
   state: ZoneState
   access: ZoneAccess
   visibility: ZoneVisibility
 }
 
-export const zones: Zone[] = [
+export const zoneDefinitions: ZoneDefinition[] = [
   {
     id: 'aeterna-gates',
     name: 'Aeterna Gates',
@@ -72,7 +72,7 @@ export const zones: Zone[] = [
 ]
 
 export function createZoneSnapshots(currentMoonPhase: MoonPhase, isGreatTeacher: boolean): ZoneSnapshot[] {
-  return zones.map((zone) => {
+  return zoneDefinitions.map((zone) => {
     let state: ZoneState = 'stable'
     let access: ZoneAccess = zone.id === 'aeterna-gates' ? 'open' : 'trial'
     let visibility: ZoneVisibility = 'clear'
