@@ -1,9 +1,10 @@
 import { useGameStore } from '../stores/gameStore'
 
 export default function QuestBoard() {
-  const { quests, currentMoonPhase, loading, completeQuest } = useGameStore((state) => ({
+  const { quests, currentMoonPhase, souls, loading, completeQuest } = useGameStore((state) => ({
     quests: state.quests,
     currentMoonPhase: state.currentMoonPhase,
+    souls: state.souls,
     loading: state.loading,
     completeQuest: state.completeQuest,
   }))
@@ -36,7 +37,7 @@ export default function QuestBoard() {
               <button
                 type="button"
                 onClick={() => void completeQuest(quest.id)}
-                disabled={loading || quest.status === 'completed'}
+                disabled={loading || quest.status === 'completed' || souls < quest.soulCost}
                 className="rounded-full bg-violet-500 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-700"
               >
                 {quest.status === 'completed' ? 'Completed' : 'Complete quest'}

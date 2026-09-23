@@ -69,7 +69,7 @@ export default function WorldMap() {
                   <button
                     type="button"
                     onClick={() => void resolveBattle(zone.id)}
-                    disabled={loading || zone.access === 'teacher-only'}
+                    disabled={loading || zone.access !== 'open'}
                     className="rounded-full bg-rose-500 px-4 py-2 text-sm font-semibold text-white disabled:cursor-not-allowed disabled:bg-gray-700"
                   >
                     Resolve PvP
